@@ -5,12 +5,14 @@
 #include <string.h>
 #include <stdio.h>
 #include "lexer.h"
+#include "list.h"
 
 char *source;
 unsigned long len;
 unsigned int cur_index;
 unsigned int cur_pos;
 unsigned int cur_line = 1;
+
 
 int read_char(){
     if (cur_index >= len)
@@ -71,4 +73,5 @@ void lexer(char *s){
                 }
         }
     }
+
 }
