@@ -4,9 +4,8 @@
 
 #ifndef TIMELY_LANG_TOKEN_H
 #define TIMELY_LANG_TOKEN_H
-
-
 #define token_define static const int
+
 
 token_define ID         = 200; // 标识符
 token_define END        = 201; // 项目结束符
@@ -17,6 +16,7 @@ token_define DO         = 205; // do
 token_define FUN        = 206; // fun
 token_define CLASS      = 207; // class
 token_define NUMBER     = 208; // number
+token_define EMPTY      = 209; // 什么都没有
 
 token_define PS         = 37; // %
 token_define AND        = 38; // &
@@ -28,6 +28,9 @@ token_define PS_EQ      = 180;// %=
 token_define AND_EQ     = 181;// &=
 token_define OR_EQ      = 182;// |=
 token_define XOR_ER     = 183;// ^=
+token_define OR2        = 184;// ||
+token_define AND2       = 185;// &&
+
 
 token_define MUL        = 42; // *
 token_define ADD        = 43; // +
@@ -63,6 +66,47 @@ token_define CL_BRA     = 41; // )
 token_define OP_FL_BRA  = 123; // {
 token_define CL_FL_BRA  = 125; // }
 
+
+typedef struct{
+    const int kind;
+    const char* symbol;
+}Symbol;
+
+
+static const Symbol symbol_table[] = {
+        {ADD2, "++"},
+        {EQ2, "=="},
+        {ADD_EQ, "+="},
+        {AND_EQ,"&="},
+        {OR_EQ, "|="},
+        {MUL_EQ, "*="},
+        {DIV_EQ, "/="},
+        {MIN_EQ, "-="},
+        {MIN2, "--"},
+        {PS_EQ, "%="},
+        {XOR_ER, "^="},
+        {LE_EQ, "<="},
+        {BIG_EQ, ">="},
+        {EM_EQ, "!="},
+        {OR2, "||"},
+        {AND2, "&&"},
+        {IF, "if"},
+        {ELSE, "else"},
+        {WHILE, "while"},
+        {DO, "do"},
+        {FUN, "fun"},
+};
+
+/**
+ * 空符号
+ */
+static const  Symbol EMPTY_SYMBOL = {EMPTY};
+
+/**
+ * 符号表数量
+ */
+static const int symbol_count = sizeof(symbol_table) / sizeof(Symbol);
+
 // token
 typedef struct {
     int kind;
@@ -71,5 +115,10 @@ typedef struct {
     unsigned int row_pos;
 }Token;
 
+/**
+ * 查找符号
+ * @return 没有找到返回 EMPTY_SYMBOL  否则被找到的符号
+ */
+Symbol find_symbol(char *symbol);
 
 #endif //TIMELY_LANG_TOKEN_H
