@@ -13,6 +13,7 @@ typedef struct node{
     struct node* next;
 }Node;
 
+
 struct list{
     Node* head;
     Node* tail;
