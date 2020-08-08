@@ -5,6 +5,7 @@
 #define TIMELY_LANG_LIST_C_H
 #include "list.h"
 
+
 Node* new_node(void* data){
     Node* node = malloc(sizeof(Node));
     node->data = data;
@@ -143,5 +144,12 @@ void* list_remove(struct list* list, int index){
     return node->data;
 }
 
+char* to_string(struct list* list){
+    char* s= malloc(sizeof(char ) * list->size);
+    for (int i = 0; i < list->size; ++i) {
+        s[i] = *(char*)list_get(list, i);
+    }
+    return s;
+}
 
 #endif //TIMELY_LANG_LIST_C_H

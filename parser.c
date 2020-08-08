@@ -3,8 +3,8 @@
 //
 #include "parser.h"
 
-void move(){
-//    token = lexer_read();
+void move(Parser *parser){
+    parser->token =  lexer_read(parser->lexer);
 }
 
 struct parser* new_parser(Lexer* lexer){
@@ -15,9 +15,24 @@ struct parser* new_parser(Lexer* lexer){
 }
 
 
-int parse(struct parser* parser){
-    while (lexer_read(parser->lexer)->kind  != END){
-
+int parse(Parser* parser){
+    move(parser);
+    while (parser->token->kind != END){
+        print("kind: %d,  text: %s, line: %d, pos: %d, size: %d",
+              parser->token->kind,
+              parser->token->text,
+              parser->token->row_pos,
+              parser->token->col_pos,
+              parser->lexer->tokens->size);
+        move(parser);
     }
     return -1;
 }
+
+Tree expr(Parser *parser){
+
+}
+
+
+
+

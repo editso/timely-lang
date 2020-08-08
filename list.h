@@ -58,4 +58,6 @@ void* list_get(struct list*, int);
  */
 void* list_remove(struct list*, int);
 
+char* to_string(struct list*);
+
 #endif //TIMELY_LANG_LIST_H
