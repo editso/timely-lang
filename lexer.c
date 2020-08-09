@@ -9,19 +9,21 @@
 #include <fcntl.h>
 #include "lexer.h"
 #include "list.h"
+#include "basic.h"
 
 char buf[1];
+
 
 int read_char(struct lexer* lexer){
     if (lexer->last_chr == EMPTY){
         bzero(buf,sizeof(buf));
+        lexer->col_pos++;
         if (read(lexer->fd, buf, sizeof(buf)) <= 0){
             close(lexer->fd); // 关流
             lexer->also = t_false;
             return END;
         }
-        lexer->cur_pos++;
-        return buf[0];
+        return *buf;
     }else{
         int chr = lexer->last_chr;
         lexer->last_chr = EMPTY;
@@ -50,13 +52,13 @@ void set_last_chr(Lexer* lexer, int pos){
     lexer->last_chr = pos;
 }
 
-char* read_letter(struct lexer* lexer){
+char* read_letter(Lexer *lexer){
     int chr;
     struct list* buff = new_list();
     while ((chr = read_char(lexer)) != END){
         // a_9 | a$9
         if (is_letter(chr) || is_symbol(chr) || is_digit(chr)){
-            list_add(buff, (void *)chr);
+            list_add(buff, GET_CHAR(chr));
         }else{
             set_last_chr(lexer, chr);
             break;
@@ -67,42 +69,22 @@ char* read_letter(struct lexer* lexer){
     return s;
 }
 
-Symbol find_symbol(char *symbol){
-    for (int i = 0; i < symbol_count; ++i) {
-        if (strcmp(symbol_table[i].symbol, symbol) == 0){
-            return symbol_table[i];
-        }
-    }
-    return EMPTY_SYMBOL;
-}
-
-Token* new_token(struct lexer* lexer, int kind, char *text){
-    Token* token = malloc(sizeof(Token));
-    token->col_pos = lexer->cur_pos - 1 - strlen(text);
-    token->row_pos = lexer->cur_line;
-    token->kind = kind;
-    token->text = text;
-    return token;
-}
-
-char* read_digit(struct lexer* lexer){
+char* read_digit(Lexer *lexer){
     int chr;
     struct list *buff = new_list();
     t_bool dot = t_false;
     while ((chr = read_char(lexer)) != END){
         if (is_digit(chr)){
-            list_add(buff, (void *)chr);
+            list_add(buff, GET_CHAR(chr));
         } else if (chr == '.' && !dot){
             dot = t_true;
             int pre_chr = chr;
             chr = read_char(lexer);
             if (is_digit(chr)){
-                list_add(buff, (void *)pre_chr);
-                list_add(buff, (void *)chr);
+                list_add(buff, GET_CHAR(pre_chr));
+                list_add(buff, GET_CHAR(chr));
                 dot = t_true;
             }else{
-                char *ch = malloc(sizeof(char));
-                *ch = (char)chr;
                 set_last_chr(lexer, chr);
                 break;
             }
@@ -116,6 +98,51 @@ char* read_digit(struct lexer* lexer){
     return s;
 }
 
+char* read_string(Lexer *lexer){
+    int chr;
+    struct list *buff = new_list();
+    int flag = 0;
+    while ((chr = read_char(lexer)) != END){
+        if (chr == '\'' || chr == '"'){
+            list_add(buff, GET_CHAR(chr));
+            if (flag && !strcmp((char *)&chr, buff->head->data)){
+                break;
+            }
+            flag = 1;
+        }else{
+            list_add(buff, GET_CHAR(chr));
+        }
+    }
+    if (chr == END){
+        lexer_error("String is not closed normally",
+                    to_string(buff),
+                    lexer->row_pos,
+                    lexer->col_pos);
+    }
+    char *s = to_string(buff);
+    free(buff);
+    return s;
+}
+
+KindMeta find_kind(char *kind){
+    for (int i = 0; i < kind_count; ++i) {
+        if (strcmp(kind_table[i].name, kind) == 0){
+            return kind_table[i];
+        }
+    }
+    return EMPTY_KIND;
+}
+
+Token* new_token(struct lexer* lexer, int kind, char *text){
+    Token* token = malloc(sizeof(Token));
+    token->col_pos = lexer->col_pos - 1 - strlen(text);
+    token->row_pos = lexer->row_pos;
+    token->kind = kind;
+    token->text = text;
+    return token;
+}
+
+
 
 Token* new_end_token(){
     Token* token = malloc(sizeof(Token));
@@ -123,13 +150,13 @@ Token* new_end_token(){
     return token;
 }
 
-void read_line(Lexer *lexer){
+void read_all(Lexer *lexer){
     int chr;
     while ((chr = read_char(lexer)) != END){
         if (is_new_line(chr)){
-            lexer->cur_pos = 0;
-            lexer->cur_line++;
-            break;
+            lexer->col_pos = 1;
+            lexer->row_pos++;
+            continue;
         }
         switch (chr) {
             case '+':
@@ -162,8 +189,8 @@ void read_line(Lexer *lexer){
                         char *array = malloc(sizeof(char) + 1);
                         array[0] = (char)chr;
                         array[1] = (char)op;
-                        Symbol symbol = find_symbol(array);
-                        list_add(lexer->tokens, new_token(lexer, symbol.kind, array));
+                        KindMeta kind = find_kind(array);
+                        list_add(lexer->tokens, new_token(lexer, kind.kind, array));
                         break;
                     }
                     default:{
@@ -176,10 +203,19 @@ void read_line(Lexer *lexer){
                 }
                 break;
             }
+            case '\'':
+            case '"':
+                /**
+                 *  处理字符串
+                 *
+                 */
+                set_last_chr(lexer, chr);
+                list_add(lexer->tokens, new_token(lexer, STRING, read_string(lexer)));
+                break;
             default:{
                 if (is_digit(chr)){
                     set_last_chr(lexer, chr);
-                    list_add(lexer->tokens, new_token(lexer,NUMBER,read_digit(lexer)));
+                    list_add(lexer->tokens, new_token(lexer,NUMBER, read_digit(lexer)));
                 } else if (is_letter(chr) || is_symbol(chr)){
                     set_last_chr(lexer, chr);
                     list_add(lexer->tokens, new_token(lexer, ID, read_letter(lexer)));
@@ -199,10 +235,7 @@ void read_line(Lexer *lexer){
 t_bool fill_list(Lexer* lexer, int index){
     if (index >= lexer->tokens->size){
         if (lexer->also){
-            int size = lexer->tokens->size;
-            do {
-                read_line(lexer);
-            }while (lexer->also || index >= lexer->tokens->size);
+            read_all(lexer);
         } else{
             return t_false;
         }
@@ -218,11 +251,12 @@ Lexer* new_lexer(char *file){
         exit(0);
     }
     lexer->last_chr = EMPTY;
-    lexer->cur_pos = 1;
-    lexer->cur_line = 1;
+    lexer->row_pos = 1;
+    lexer->col_pos = 1;
     lexer->also = t_true;
     return lexer;
 }
+
 
 Token* lexer_read(Lexer *lexer){
     Token* token;
