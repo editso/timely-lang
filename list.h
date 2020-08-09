@@ -50,6 +50,8 @@ void list_add(struct list*, void *);
  */
 void* list_get(struct list*, int);
 
+
+
 /**
  * 删除一个list中指定的元素
  * @param list list 指向list的指针

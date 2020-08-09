@@ -8,10 +8,12 @@
 #include "lexer.h"
 
 typedef struct parser{
-    struct lexer *lexer;
-    struct Tree *root;
+    Lexer *lexer;
+    Tree *root;
     Token* token;
 }Parser;
+
+#define GET_TOKEN(parser) (parser->token)
 
 Parser* new_parser(Lexer* lexer);
 

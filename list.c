@@ -4,7 +4,7 @@
 #ifndef TIMELY_LANG_LIST_C_H
 #define TIMELY_LANG_LIST_C_H
 #include "list.h"
-
+#include "string.h"
 
 Node* new_node(void* data){
     Node* node = malloc(sizeof(Node));
@@ -91,13 +91,7 @@ int list_insert(struct list* list, int index, void *data){
 }
 
 
-/**
- * 获取指定位置的元素
- * @param list 指向list的指针
- * @param i 位置
- * @return 如果有返回元素的数据,否则NULL
- */
-void* list_get(struct list* list, int index){
+Node* list_get_(struct list* list, int index){
     if (index >= list->size || index < 0){
         return NULL;
     }
@@ -113,6 +107,17 @@ void* list_get(struct list* list, int index){
     return NULL;
 }
 
+/**
+ * 获取指定位置的元素
+ * @param list 指向list的指针
+ * @param i 位置
+ * @return 如果有返回元素的数据,否则NULL
+ */
+void* list_get(struct list* list, int index){
+    Node* node = list_get_(list, index);
+    if (node == NULL)return NULL;
+    return node->data;
+}
 
 /**
  * 删除一个list中指定的元素
@@ -124,7 +129,7 @@ void* list_remove(struct list* list, int index){
     if (index >= list->size){
         return NULL;
     }
-    Node *node = list_get(list, index);
+    Node *node = list_get_(list, index);
     if (node == NULL)
         return NULL;
     if (index == 0){
@@ -147,9 +152,10 @@ void* list_remove(struct list* list, int index){
 char* to_string(struct list* list){
     char* s= malloc(sizeof(char ) * list->size);
     for (int i = 0; i < list->size; ++i) {
-        s[i] = *(char*)list_get(list, i);
+        memmove(s+i, list_get(list, i), 1);
     }
     return s;
 }
+
 
 #endif //TIMELY_LANG_LIST_C_H
