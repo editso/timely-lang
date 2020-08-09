@@ -6,7 +6,7 @@
 #define TIMELY_LANG_TOKEN_H
 #define t_kind const int
 
-enum Kind{
+typedef enum {
     ID         = 200, // 标识符
     END        = 201, // 项目结束符
     IF         = 202, // if
@@ -17,6 +17,7 @@ enum Kind{
     CLASS      = 207, // class
     NUMBER     = 208, // number
     EMPTY      = 209, // 什么都没有
+    STRING     = 210, // string
 
     PS         = 37, // %
     AND        = 38, // &
@@ -65,14 +66,19 @@ enum Kind{
     CL_BRA     = 41, // )
     OP_FL_BRA  = 123, // {
     CL_FL_BRA  = 125, // }
-};
+}Kind;
 
+
+/**
+ * Kind 元信息
+ */
 typedef struct{
-    enum Kind kind;
+    Kind kind;
     const char* name;
-}op_kind;
+}KindMeta;
 
-static const op_kind kind_table[] = {
+
+static const KindMeta kind_table[] = {
         {ADD2, "++"},
         {EQ2, "=="},
         {ADD_EQ, "+="},
@@ -96,28 +102,35 @@ static const op_kind kind_table[] = {
         {FUN, "fun"},
 };
 
+
+
 /**
  * 空符号
  */
-static const  op_kind EMPTY_SYMBOL = {EMPTY};
+static const  KindMeta EMPTY_KIND = {EMPTY};
 
 /**
  * 符号表数量
  */
-static const int symbol_count = sizeof(kind_table) / sizeof(op_kind);
+static const int kind_count = sizeof(kind_table) / sizeof(KindMeta);
 
 // token
 typedef struct {
-    enum Kind kind;
+    Kind kind;
     char *text;
     unsigned int col_pos;
     unsigned int row_pos;
 }Token;
 
+
 /**
  * 查找符号
- * @return 没有找到返回 EMPTY_SYMBOL  否则被找到的符号
+ * @return 没有找到返回 EMPTY_KIND  否则被找到的符号
  */
-op_kind find_kind(char *kind);
+KindMeta find_kind(char *kind);
+
+
+KindMeta get_kind_meta(Kind kind);
+
 
 #endif //TIMELY_LANG_TOKEN_H
