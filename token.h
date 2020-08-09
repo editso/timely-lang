@@ -4,7 +4,7 @@
 
 #ifndef TIMELY_LANG_TOKEN_H
 #define TIMELY_LANG_TOKEN_H
-#define t_kind const int
+
 
 typedef enum {
     ID         = 200, // 标识符

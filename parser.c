@@ -7,11 +7,12 @@ void move(Parser *parser){
     parser->token =  lexer_read(parser->lexer);
 }
 
-
-void* match(Parser* parser, t_kind kind){
+void match(Parser* parser, Kind kind){
     if (kind != GET_TOKEN(parser)->kind){
-
+        print("需要: %s, 出现: %s", GET_TOKEN(parser)->text, get_kind_meta(kind).name);
+        abort();
     }
+    move(parser);
 }
 
 struct parser* new_parser(Lexer* lexer){
@@ -24,8 +25,6 @@ struct parser* new_parser(Lexer* lexer){
 void* parseExpr(Parser* parser){
 
 }
-
-
 
 void* parse_stmt(Parser* parser){
     switch (GET_TOKEN(parser)->kind) {
