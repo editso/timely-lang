@@ -1,4 +1,5 @@
 #include "parser.h"
+#include "ast/eval.h"
 
 
 int main(int argc, char **argv) {

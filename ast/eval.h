@@ -9,11 +9,12 @@
 void* binary_eval(Environment* env, BinaryExpr* expr);
 void* while_eval(Environment* env, WhileStmt* stmt);
 void* var_eval(Environment* env, VarTerm* term);
-void* constraint_eval(Environment* env, ConstantTerm* term);
+void* constant_eval(Environment* env, ConstantTerm* term);
 void* block_eval(Environment* env, BlockStmt* stmt);
 void* start_eval(Environment* env, StartTerm * stmt);
 void* end_eval(Environment* env, EndTerm * stmt);
 void* call_eval(Environment* env, CallTerm* term);
+void* empty_eval(Environment* env, EmptyStmt* term);
 
 Eval* new_eval(void* (*eval_call)(Environment* env, void* node));
 

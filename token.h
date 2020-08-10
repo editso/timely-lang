@@ -56,7 +56,7 @@ typedef enum {
     BIG2       = 166, // >>
 
     COLON      = 58, // :
-    SEMI       = 59, // ,
+    SEMI       = 59, // ;
     DOT        = 46, // .
     DQ         = 34, // "
     COMM       = 44, // ,
@@ -102,8 +102,6 @@ static const KindMeta kind_table[] = {
         {DO,     "do"},
         {FUN,    "fun"},
 };
-
-
 
 /**
  * 空符号

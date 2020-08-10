@@ -52,8 +52,9 @@ void print(char *s, ...){
 }
 
 void out_token(Token* token){
-    print("<Kind=%s, (%d,%d)>",
+    print("<Kind=%s<%d>, (%d,%d)>",
           token->text,
+          token->kind,
           token->row_pos,
           token->col_pos);
 }

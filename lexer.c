@@ -221,7 +221,12 @@ void read_all(Lexer *lexer){
                     list_add(lexer->tokens, new_token(lexer,NUMBER, read_digit(lexer)));
                 } else if (is_letter(chr) || is_symbol(chr)){
                     set_last_chr(lexer, chr);
-                    list_add(lexer->tokens, new_token(lexer, ID, read_letter(lexer)));
+                    Kind kind;
+                    char *c = read_letter(lexer);
+                    if ((kind = find_kind(c).kind) == EMPTY){
+                        kind = ID;
+                    }
+                    list_add(lexer->tokens, new_token(lexer, kind, c));
                 }
             }
         }

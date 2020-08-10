@@ -18,18 +18,16 @@ typedef struct{
 
 #define GET_EVAL(eval) ((Eval*)eval)
 
-
-
 #define GET_FUN(fun) ((void *(*)(Environment *, void *))fun)
 
 
 typedef struct{
-    Eval *eval;
+    Eval eval;
     struct list* stmts;
 }Tree;
 
 typedef struct {
-    Eval *eval;
+    Eval eval;
     void* left;
     Token *op;
     void* right;
@@ -37,25 +35,26 @@ typedef struct {
 
 
 typedef struct {
-    Eval *eval;
+    Eval eval;
     Token *op;
     void* expr;
 }StartTerm;
 
 typedef struct {
-    Eval *eval;
+    Eval eval;
     Token *op;
     void* expr;
 }EndTerm;
 
 typedef struct{
-    Eval *eval;
+    Eval eval;
     Token *name;
     void* value;
 }VarTerm;
 
+
 typedef struct{
-    Eval *eval;
+    Eval eval;
     Token *name;
 }ConstantTerm;
 
@@ -63,27 +62,30 @@ typedef struct{
  * 函数调用
  */
 typedef struct{
-    Eval *eval;
+    Eval eval;
     void *expr;
     struct list* args;
 }CallTerm;
 
 
 typedef struct{
-    Eval *eval;
+    Eval eval;
     struct list* stmts;
 }BlockStmt;
 
 typedef struct {
-
+    Eval eval;
+    Token* token;
 }EmptyStmt;
 
 typedef struct{
-    Eval *eval;
+    Eval eval;
     Token *name;
     void* expr;
-    BlockStmt* block;
+    void* block;
 }WhileStmt;
+
+
 
 Tree* new_tree(struct list* list);
 
@@ -95,11 +97,13 @@ BinaryExpr* new_binary_expr(void* left,Token* op, void* right);
 
 BlockStmt* new_block_stmt(struct list* stmts);
 
-WhileStmt* new_while_stmt(Token* name, void* expr, BlockStmt* block);
+WhileStmt* new_while_stmt(Token* name, void* expr, void* block);
 
 StartTerm* new_start_term(Token* op, void* expr);
 
 EndTerm* new_end_term(Token* op, void* expr);
+
+EmptyStmt* new_empty(Token *op);
 
 CallTerm* new_call_term(void* expr, struct list* args);
 #endif //TIMELY_LANG_TREE_H
