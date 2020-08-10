@@ -2,14 +2,19 @@
 // Created by zy on 8/7/20.
 //
 #include "parser.h"
+#include "ast/eval.h"
 
 void move(Parser *parser) {
     parser->token = lexer_read(parser->lexer);
 }
 
+Token* peek(Parser* parser, int index){
+    return lexer_peek(parser->lexer, index);
+}
+
 void match(Parser *parser, Kind kind) {
     if (kind != GET_TOKEN(parser)->kind) {
-        print("需要: %s, 出现: %s", GET_TOKEN(parser)->text, get_kind_meta(kind).name);
+        print("需要: %s, 出现: %s", get_kind_meta(kind).name, GET_TOKEN(parser)->text);
         abort();
     }
     move(parser);
@@ -23,20 +28,37 @@ struct parser *new_parser(Lexer *lexer) {
 }
 
 
+
+
 void *parse_stmt(Parser *parser) {
-    switch (GET_TOKEN(parser)->kind) {
+    Token *token;
+    switch ((token = GET_TOKEN(parser))->kind) {
+        case SEMI:
+            return new_empty(token);
         case ID: {
-            Token *token = GET_TOKEN(parser);
-            move(parser);
-            if (GET_TOKEN(parser)->kind == EQ) {
-                move(parser);
-                GET_EVAL(new_var_term(token, parse_expr(parser)));
-//                return new_var_term(token, parse_expr(parser));
-                return NULL;
+            switch (peek(parser, 0)->kind) {
+                case EQ:{
+                    move(parser);
+                    move(parser);
+                    return new_var_term(token, parse_expr(parser));
+                }
+                case OP_BRA:{
+                    return parse_expr(parser);
+                }
+                default:
+                    print("错误");
+                    abort();
             }
         }
+        case WHILE:{
+            move(parser);
+            match(parser, OP_BRA);
+            void* expr = parse_expr(parser);
+            match(parser, CL_BRA);
+            return new_while_stmt(token, expr, parse_block(parser));
+        }
         default:
-//            out_token(GET_TOKEN(parser));
+            out_token(GET_TOKEN(parser));
             return NULL;
     }
 }
@@ -45,9 +67,7 @@ void *parse_stmt(Parser *parser) {
 int parse(Parser *parser) {
     move(parser);
     while (GET_TOKEN(parser)->kind != END) {
-        out_token(GET_TOKEN(parser));
         list_add(parser->root->stmts, parse_stmt(parser));
-        print("size: %d", parser->root->stmts->size);
         move(parser);
     }
     return -1;
@@ -58,18 +78,26 @@ void runner(Parser* parser){
     void* eval;
     for (int i = 0; i < stmts->size; ++i) {
         eval = list_get(stmts, i);
-//        GET_EVAL(eval)->eval(NULL, eval);
+        GET_EVAL(eval)->eval(NULL, eval);
     }
 }
+
 
 void *parse_while(Parser *parser) {
     return NULL;
 }
 
 void *parse_block(Parser *parser) {
-    return NULL;
+    match(parser, OP_FL_BRA);
+    struct list *stmts = new_list();
+    while (GET_TOKEN(parser)->kind != CL_FL_BRA){
+        list_add(stmts, parse_stmt(parser));
+        move(parser);
+    }
+    print("size: %d",stmts->size);
+    match(parser, CL_FL_BRA);
+    return new_block_stmt(stmts);
 }
-
 
 void *parse_expr(Parser *parser) {
     void* left = parse_or(parser);
@@ -234,6 +262,8 @@ void *parse_start(Parser *parser) {
     }
 }
 
+
+
 /**
  * 后缀表达式
  * a++, b--, (), .
@@ -250,13 +280,15 @@ void *parse_end(Parser *parser) {
             }
             case OP_BRA:{
                 token = GET_TOKEN(parser);
-                move(parser);
                 struct list* args = new_list();
-                while (GET_TOKEN(parser)->kind !=  CL_BRA){
+                do {
                     move(parser);
-                    if (GET_TOKEN(parser)->kind == COMM)continue;
+                    if (GET_TOKEN(parser)->kind == COMM){
+                        move(parser);
+                        continue;
+                    }
                     list_add(args, parse_expr(parser));
-                }
+                }while (GET_TOKEN(parser)->kind !=  CL_BRA);
                 match(parser, CL_BRA);
                 return new_call_term(left, args);
             }
@@ -275,6 +307,7 @@ void *parse_constant(Parser *parser) {
     switch (token->kind) {
         case ID:
         case NUMBER:
+        case STRING:
             move(parser);
             return new_constant_term(token);
         default:
