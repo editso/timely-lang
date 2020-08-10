@@ -4,6 +4,9 @@
 #include "parser.h"
 #include "ast/eval.h"
 
+
+
+
 void move(Parser *parser) {
     parser->token = lexer_read(parser->lexer);
 }
@@ -20,6 +23,21 @@ void match(Parser *parser, Kind kind) {
     move(parser);
 }
 
+/**
+ * 匹配一行结尾
+ */
+void match_end(Parser* parser){
+    Token* token = GET_TOKEN(parser);
+    if (token->kind != NEWLINE && token->kind != SEMI && token->kind != END){
+        print("在第 %d 行结尾需要 ';' 或另起一行(%d,%d)",
+              token->row_pos,
+              token->row_pos,
+              token->col_pos);
+        abort();
+    }
+    move(parser);
+}
+
 struct parser *new_parser(Lexer *lexer) {
     struct parser *parser = malloc(sizeof(struct parser));
     parser->lexer = lexer;
@@ -28,35 +46,39 @@ struct parser *new_parser(Lexer *lexer) {
 }
 
 
-
-
 void *parse_stmt(Parser *parser) {
     Token *token;
     switch ((token = GET_TOKEN(parser))->kind) {
         case SEMI:
             return new_empty(token);
+        case COMM:
+            move(parser);
         case ID: {
-            switch (peek(parser, 0)->kind) {
-                case EQ:{
-                    move(parser);
-                    move(parser);
-                    return new_var_term(token, parse_expr(parser));
-                }
-                case OP_BRA:{
-                    return parse_expr(parser);
-                }
-                default:
-                    print("错误");
-                    abort();
+            if (peek(parser, 0)->kind == EQ){
+                move(parser);
+                move(parser);
+                void* var = new_var_term(token, parse_expr(parser));
+                match_end(parser);
+                return var;
             }
+            return parse_expr(parser);
         }
-        case WHILE:{
+        case FUN:{
             move(parser);
             match(parser, OP_BRA);
-            void* expr = parse_expr(parser);
+            struct list *args = new_list();
+            while (GET_TOKEN(parser)->kind != CL_BRA){
+                if (GET_TOKEN(parser)->kind == COMM){
+                    move(parser);
+                    continue;
+                }
+                list_add(args, parse_expr(parser));
+            }
             match(parser, CL_BRA);
-            return new_while_stmt(token, expr, parse_block(parser));
+            return new_fun_stmt(token,args, parse_block(parser));
         }
+        case WHILE:
+            return parse_while(parser);
         default:
             out_token(GET_TOKEN(parser));
             return NULL;
@@ -67,25 +89,29 @@ void *parse_stmt(Parser *parser) {
 int parse(Parser *parser) {
     move(parser);
     while (GET_TOKEN(parser)->kind != END) {
-        list_add(parser->root->stmts, parse_stmt(parser));
+//        list_add(parser->root->stmts, parse_stmt(parser));
+        out_token(GET_TOKEN(parser));
         move(parser);
     }
     return -1;
 }
 
+
 void runner(Parser* parser){
-    struct list *stmts = parser->root->stmts;
-    void* eval;
-    for (int i = 0; i < stmts->size; ++i) {
-        eval = list_get(stmts, i);
-        GET_EVAL(eval)->eval(NULL, eval);
-    }
+    GET_EVAL(parser->root)->eval(NULL, parser->root);
 }
 
 
 void *parse_while(Parser *parser) {
-    return NULL;
+    Token *token = GET_TOKEN(parser);
+    move(parser);
+    match(parser, OP_BRA);
+    void* expr = parse_expr(parser);
+    match(parser, CL_BRA);
+    match_end(parser);
+    return new_while_stmt(token, expr, parse_block(parser));
 }
+
 
 void *parse_block(Parser *parser) {
     match(parser, OP_FL_BRA);
@@ -94,10 +120,11 @@ void *parse_block(Parser *parser) {
         list_add(stmts, parse_stmt(parser));
         move(parser);
     }
-    print("size: %d",stmts->size);
     match(parser, CL_FL_BRA);
+    match_end(parser);
     return new_block_stmt(stmts);
 }
+
 
 void *parse_expr(Parser *parser) {
     void* left = parse_or(parser);

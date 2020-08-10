@@ -18,6 +18,12 @@ typedef enum {
     NUMBER     = 208, // number
     EMPTY      = 209, // 什么都没有
     STRING     = 210, // string
+    NEWLINE    = 211, // newline \r\n
+    IMPORT     = 212, // import
+    DOT2       = 213, // ..
+    RETURN     = 214, // return
+    BREAK      = 215, // break
+    CONTINUE   = 216, // continue
 
     MOD         = 37, // %
     AND        = 38, // &
@@ -61,6 +67,7 @@ typedef enum {
     DQ         = 34, // "
     COMM       = 44, // ,
 
+
     OP_SQ_BRA  = 91, // [
     CL_SQ_BRA  = 93, // ]
     OP_BRA     = 40, // (
@@ -101,6 +108,11 @@ static const KindMeta kind_table[] = {
         {WHILE,  "while"},
         {DO,     "do"},
         {FUN,    "fun"},
+        {IMPORT, "import"},
+        {DOT2, ".."},
+        {RETURN, "return"},
+        {CONTINUE, "continue"},
+        {BREAK,  "break"}
 };
 
 /**

@@ -52,12 +52,17 @@ void print(char *s, ...){
 }
 
 void out_token(Token* token){
+    char *s = token->text;
+    if (token->kind == NEWLINE){
+        s = "<New Line>";
+    }
     print("<Kind=%s<%d>, (%d,%d)>",
-          token->text,
+          s,
           token->kind,
           token->row_pos,
           token->col_pos);
 }
+
 
 long to_number(struct list *list){
     char *buf = malloc(sizeof(char) * list->size);

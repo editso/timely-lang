@@ -10,12 +10,21 @@
 #include "token.h"
 #include "log.h"
 #include "string.h"
+#include "setjmp.h"
+#include "errno.h"
 
 #define GET_CHAR(chr) memset(malloc(sizeof(char)), chr, 1)
 #define t_bool int
 #define t_true  1
 #define t_false 0
 
+#ifndef __TIMELY__JMP__
+#define __TIMELY__JMP__
+
+#define try(buff) if(!setjmp(buff))
+#define catch(no) else if(errno == no)
+#define throw(buff,v) longjmp(buff,v);
+#endif
 
 void print(char *, ...);
 

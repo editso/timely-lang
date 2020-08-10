@@ -11,19 +11,18 @@
 #include "list.h"
 #include "basic.h"
 
-char buf[1];
-
+char c_buf_[1];
 
 int read_char(struct lexer* lexer){
     if (lexer->last_chr == EMPTY){
-        bzero(buf,sizeof(buf));
+        bzero(c_buf_, sizeof(c_buf_));
         lexer->col_pos++;
-        if (read(lexer->fd, buf, sizeof(buf)) <= 0){
+        if (read(lexer->fd, c_buf_, sizeof(c_buf_)) <= 0){
             close(lexer->fd); // 关流
             lexer->also = t_false;
             return END;
         }
-        return *buf;
+        return *c_buf_;
     }else{
         int chr = lexer->last_chr;
         lexer->last_chr = EMPTY;
@@ -156,7 +155,6 @@ void read_all(Lexer *lexer){
         if (is_new_line(chr)){
             lexer->col_pos = 1;
             lexer->row_pos++;
-            continue;
         }
         switch (chr) {
             case '+':
@@ -184,6 +182,7 @@ void read_all(Lexer *lexer){
                  * ++  -- ....
                  */
                 switch (op) {
+                    case '.':
                     case '+':
                     case '-':
                     case '&':
@@ -227,6 +226,10 @@ void read_all(Lexer *lexer){
                         kind = ID;
                     }
                     list_add(lexer->tokens, new_token(lexer, kind, c));
+                }else if (is_new_line(chr)){
+                    char* s = malloc(sizeof(char));
+                    *s = (char)chr;
+                    list_add(lexer->tokens, new_token(lexer, NEWLINE, s));
                 }
             }
         }

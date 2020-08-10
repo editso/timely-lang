@@ -15,7 +15,8 @@ void* start_eval(Environment* env, StartTerm * stmt);
 void* end_eval(Environment* env, EndTerm * stmt);
 void* call_eval(Environment* env, CallTerm* term);
 void* empty_eval(Environment* env, EmptyStmt* term);
-
+void* fun_eval(Environment* env, FunStmt* fun);
+void* tree_eval(Environment* env, Tree* eval);
 Eval* new_eval(void* (*eval_call)(Environment* env, void* node));
 
 

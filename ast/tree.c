@@ -21,7 +21,7 @@ void* while_eval(Environment* env, WhileStmt* stmt){
 
 
 void* var_eval(Environment* env, VarTerm* term){
-    print(">> %s",term->name->text);
+    print("var_eval:%s",term->name->text);
     return NULL;
 }
 
@@ -76,8 +76,20 @@ void* call_eval(Environment* env, CallTerm* term){
 
 
 void* empty_eval(Environment* env, EmptyStmt* term){
+
     return NULL;
 }
+
+void* fun_eval(Environment* env, FunStmt* fun){
+
+}
+
+
+
+void* tree_eval(Environment* env, Tree* eval){
+
+}
+
 
 Eval* new_eval(void* (*eval_call)(Environment* env, void* node)){
     Eval* eval = malloc(sizeof(Eval));
@@ -85,10 +97,10 @@ Eval* new_eval(void* (*eval_call)(Environment* env, void* node)){
     return eval;
 }
 
-
 Tree* new_tree(struct list* list){
     Tree* tree = malloc(sizeof(Tree));
     tree->stmts = list;
+    tree->eval = *new_eval(GET_FUN(tree_eval));
     return tree;
 }
 
@@ -161,4 +173,13 @@ EmptyStmt* new_empty(Token *op){
     empty->token = op;
     empty->eval = *new_eval(GET_FUN(empty_eval));
     return empty;
+}
+
+FunStmt* new_fun_stmt(Token* name, struct list* args, void* block){
+    FunStmt* fun = malloc(sizeof(FunStmt));
+    fun->eval = *new_eval(GET_FUN(fun_eval));
+    fun->name = name;
+    fun->args = args;
+    fun->block = block;
+    return fun;
 }

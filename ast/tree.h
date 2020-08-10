@@ -85,6 +85,12 @@ typedef struct{
     void* block;
 }WhileStmt;
 
+typedef struct {
+    Eval eval;
+    Token* name;
+    struct list* args;
+    void* block;
+}FunStmt;
 
 
 Tree* new_tree(struct list* list);
@@ -104,6 +110,8 @@ StartTerm* new_start_term(Token* op, void* expr);
 EndTerm* new_end_term(Token* op, void* expr);
 
 EmptyStmt* new_empty(Token *op);
+
+FunStmt* new_fun_stmt(Token* name, struct list* args, void* block);
 
 CallTerm* new_call_term(void* expr, struct list* args);
 #endif //TIMELY_LANG_TREE_H
