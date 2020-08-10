@@ -3,58 +3,282 @@
 //
 #include "parser.h"
 
-void move(Parser *parser){
-    parser->token =  lexer_read(parser->lexer);
+void move(Parser *parser) {
+    parser->token = lexer_read(parser->lexer);
 }
 
-void match(Parser* parser, Kind kind){
-    if (kind != GET_TOKEN(parser)->kind){
+void match(Parser *parser, Kind kind) {
+    if (kind != GET_TOKEN(parser)->kind) {
         print("需要: %s, 出现: %s", GET_TOKEN(parser)->text, get_kind_meta(kind).name);
         abort();
     }
     move(parser);
 }
 
-struct parser* new_parser(Lexer* lexer){
-    struct parser* parser = malloc(sizeof(struct parser));
+struct parser *new_parser(Lexer *lexer) {
+    struct parser *parser = malloc(sizeof(struct parser));
     parser->lexer = lexer;
-    parser->root = malloc(sizeof(Tree));
+    parser->root = new_tree(new_list());
     return parser;
 }
 
-void* parseExpr(Parser* parser){
 
-}
-
-void* parse_stmt(Parser* parser){
+void *parse_stmt(Parser *parser) {
     switch (GET_TOKEN(parser)->kind) {
-        case ID:{
-            Token* token = GET_TOKEN(parser);
+        case ID: {
+            Token *token = GET_TOKEN(parser);
             move(parser);
-            if (token->kind == EQ){
+            if (GET_TOKEN(parser)->kind == EQ) {
                 move(parser);
-                return new_var_term(token, parseExpr(parser));
+                GET_EVAL(new_var_term(token, parse_expr(parser)));
+//                return new_var_term(token, parse_expr(parser));
+                return NULL;
             }
         }
-        case IF:{
-
-        }
-        case WHILE:{
-
-        }
         default:
+//            out_token(GET_TOKEN(parser));
             return NULL;
     }
 }
 
 
-int parse(Parser* parser){
+int parse(Parser *parser) {
     move(parser);
-    while (GET_TOKEN(parser)->kind != END){
-//        list_add(parser->root->stmts, parse_stmt(parser));
-        out_token(parser->token);
+    while (GET_TOKEN(parser)->kind != END) {
+        out_token(GET_TOKEN(parser));
+        list_add(parser->root->stmts, parse_stmt(parser));
+        print("size: %d", parser->root->stmts->size);
         move(parser);
     }
     return -1;
 }
 
+void runner(Parser* parser){
+    struct list *stmts = parser->root->stmts;
+    void* eval;
+    for (int i = 0; i < stmts->size; ++i) {
+        eval = list_get(stmts, i);
+//        GET_EVAL(eval)->eval(NULL, eval);
+    }
+}
+
+void *parse_while(Parser *parser) {
+    return NULL;
+}
+
+void *parse_block(Parser *parser) {
+    return NULL;
+}
+
+
+void *parse_expr(Parser *parser) {
+    void* left = parse_or(parser);
+    Token* token = GET_TOKEN(parser);
+    while (t_true){
+        // 解析二元表达式
+        switch (token->kind) {
+            case ADD:
+            case MIN:
+            case ADD_EQ:
+            case MIN_EQ:
+            case DIV_EQ:
+            case DIV:
+            case MUL:
+            case MOD:
+                token = GET_TOKEN(parser);
+                move(parser);
+                return new_binary_expr(left, token, parse_or(parser));
+            default:
+                return left;
+        }
+    }
+}
+
+/**
+ * |
+ */
+void *parse_or(Parser *parser) {
+    void* left = parser_xor(parser);
+    Token* token = GET_TOKEN(parser);
+    while (GET_TOKEN(parser)->kind == OR){
+        token = GET_TOKEN(parser);
+        move(parser);
+        left = new_binary_expr(left, token, parser_xor(parser));
+    }
+    return left;
+}
+
+/**
+ * ^
+ */
+void *parser_xor(Parser *parser) {
+    void* left = parse_and(parser);
+    Token* token = GET_TOKEN(parser);
+    while (GET_TOKEN(parser)->kind == XOR){
+        token = GET_TOKEN(parser);
+        move(parser);
+        left = new_binary_expr(left, token, parse_and(parser));
+    }
+    return left;
+}
+
+/**
+ * &
+ */
+void *parse_and(Parser *parser) {
+    void* left = parse_eq(parser);
+    Token* token = GET_TOKEN(parser);
+    while (GET_TOKEN(parser)->kind == AND){
+        token = GET_TOKEN(parser);
+        move(parser);
+        left = new_binary_expr(left, token, parse_eq(parser));
+    }
+    return left;
+}
+
+/**
+ * !=, ==
+ */
+void *parse_eq(Parser *parser) {
+    void* left = parse_bit_move(parser);
+    Token* token = GET_TOKEN(parser);
+    switch (token->kind) {
+        case EM_EQ:
+        case EQ2:
+            move(parser);
+            return new_binary_expr(left, token, parse_bit_move(parser));
+        default:
+            return left;
+    }
+}
+
+/**
+ * << >>
+ */
+void *parse_bit_move(Parser *parser) {
+    void* left = parse_add_sub(parser);
+    Token* token = GET_TOKEN(parser);
+    while (t_true){
+        switch (token->kind) {
+            case LE2:
+            case BIG2:
+                token = GET_TOKEN(parser);
+                move(parser);
+                return new_binary_expr(left, token, parse_add_sub(parser));
+            default:
+                return left;
+        }
+    }
+}
+
+/**
+ * +, -
+ * @param parser
+ * @return
+ */
+void *parse_add_sub(Parser *parser) {
+    void* left = parse_mul_div(parser);
+    Token* token = GET_TOKEN(parser);
+    while (t_true){
+        switch (token->kind) {
+            case ADD:
+            case MIN:
+                token = GET_TOKEN(parser);
+                move(parser);
+                return new_binary_expr(left, token, parse_mul_div(parser));
+            default:
+                return left;
+        }
+    }
+}
+
+
+/**
+ * *, /, %
+ * @param parser
+ */
+void *parse_mul_div(Parser *parser) {
+    void* left = parse_start(parser);
+    Token* token = GET_TOKEN(parser);
+    while (t_true){
+        switch (token->kind) {
+            case MUL:
+            case DIV:
+            case MOD:
+                token = GET_TOKEN(parser);
+                move(parser);
+                return new_binary_expr(left, token, parse_start(parser));
+            default:
+                return left;
+        }
+    }
+}
+
+/**
+ * 前缀表达式
+ * ++a, !b, --a
+ */
+void *parse_start(Parser *parser) {
+    Token* token = GET_TOKEN(parser);
+    while (t_true){
+        switch (GET_TOKEN(parser)->kind) {
+            case ADD2:
+            case MIN2:
+            case EM:
+                token = GET_TOKEN(parser);
+                move(parser);
+                return new_start_term(token, parse_end);
+            default:
+                return parse_end(parser);
+        }
+    }
+}
+
+/**
+ * 后缀表达式
+ * a++, b--, (), .
+ */
+void *parse_end(Parser *parser) {
+    void* left = parse_constant(parser);
+    Token* token = GET_TOKEN(parser);
+    while (t_true){
+        switch (token->kind) {
+            case ADD2:
+            case MIN2:{
+                move(parser);
+                return new_end_term(token, left);
+            }
+            case OP_BRA:{
+                token = GET_TOKEN(parser);
+                move(parser);
+                struct list* args = new_list();
+                while (GET_TOKEN(parser)->kind !=  CL_BRA){
+                    move(parser);
+                    if (GET_TOKEN(parser)->kind == COMM)continue;
+                    list_add(args, parse_expr(parser));
+                }
+                match(parser, CL_BRA);
+                return new_call_term(left, args);
+            }
+            case DOT:
+            default:
+                return left;
+        }
+    }
+}
+
+/**
+ * 1,2,3,5,a,b,c,d
+ */
+void *parse_constant(Parser *parser) {
+    Token* token = GET_TOKEN(parser);
+    switch (token->kind) {
+        case ID:
+        case NUMBER:
+            move(parser);
+            return new_constant_term(token);
+        default:
+            print("无法解析的表达式: %s",token->text);
+            abort();
+    }
+}
