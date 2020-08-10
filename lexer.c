@@ -187,6 +187,7 @@ void read_all(Lexer *lexer){
                     case '-':
                     case '&':
                     case '|':
+                    case '>':
                     case '=':{
                         char *array = malloc(sizeof(char) + 1);
                         array[0] = (char)chr;

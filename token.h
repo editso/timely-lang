@@ -24,6 +24,11 @@ typedef enum {
     RETURN     = 214, // return
     BREAK      = 215, // break
     CONTINUE   = 216, // continue
+    TRY        = 227, // try
+    CATCH      = 228, // catch
+    FINALLY    = 229, // finally
+    ARROW_FUN  = 230, // =>
+    SUPER      = 231, // super
 
     MOD         = 37, // %
     AND        = 38, // &
@@ -112,7 +117,13 @@ static const KindMeta kind_table[] = {
         {DOT2, ".."},
         {RETURN, "return"},
         {CONTINUE, "continue"},
-        {BREAK,  "break"}
+        {BREAK,  "break"},
+        {TRY, "try"},
+        {CATCH, "catch"},
+        {FINALLY, "finally"},
+        {CLASS, "class"},
+        {ARROW_FUN, "=>"},
+        {SUPER, "super"}
 };
 
 /**
