@@ -19,19 +19,18 @@ typedef enum {
     EMPTY      = 209, // 什么都没有
     STRING     = 210, // string
 
-    PS         = 37, // %
+    MOD         = 37, // %
     AND        = 38, // &
     OR         = 124,// |
     EM         = 33, // !
     XOR        = 94, // ^
 
-    PS_EQ      = 180,// %=
+    MOD_EQ      = 180,// %=
     AND_EQ     = 181,// &=
     OR_EQ      = 182,// |=
-    XOR_ER     = 183,// ^=
+    XOR_EQ     = 183,// ^=
     OR2        = 184,// ||
     AND2       = 185,// &&
-
 
     MUL        = 42, // *
     ADD        = 43, // +
@@ -53,6 +52,8 @@ typedef enum {
     BIG_EQ     = 161, // >=
     EQ2        = 163, // ==
     EM_EQ      = 164, // !=
+    LE2        = 165, // <<
+    BIG2       = 166, // >>
 
     COLON      = 58, // :
     SEMI       = 59, // ,
@@ -79,27 +80,27 @@ typedef struct{
 
 
 static const KindMeta kind_table[] = {
-        {ADD2, "++"},
-        {EQ2, "=="},
+        {ADD2,   "++"},
+        {EQ2,    "=="},
         {ADD_EQ, "+="},
-        {AND_EQ,"&="},
-        {OR_EQ, "|="},
+        {AND_EQ, "&="},
+        {OR_EQ,  "|="},
         {MUL_EQ, "*="},
         {DIV_EQ, "/="},
         {MIN_EQ, "-="},
-        {MIN2, "--"},
-        {PS_EQ, "%="},
-        {XOR_ER, "^="},
-        {LE_EQ, "<="},
+        {MIN2,   "--"},
+        {MOD_EQ, "%="},
+        {XOR_EQ, "^="},
+        {LE_EQ,  "<="},
         {BIG_EQ, ">="},
-        {EM_EQ, "!="},
-        {OR2, "||"},
-        {AND2, "&&"},
-        {IF, "if"},
-        {ELSE, "else"},
-        {WHILE, "while"},
-        {DO, "do"},
-        {FUN, "fun"},
+        {EM_EQ,  "!="},
+        {OR2,    "||"},
+        {AND2,   "&&"},
+        {IF,     "if"},
+        {ELSE,   "else"},
+        {WHILE,  "while"},
+        {DO,     "do"},
+        {FUN,    "fun"},
 };
 
 

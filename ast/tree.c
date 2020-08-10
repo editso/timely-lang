@@ -2,6 +2,7 @@
 // Created by zy on 8/9/20.
 //
 #include "eval.h"
+#include "../basic.h"
 
 
 void* binary_eval(Environment* env, BinaryExpr* expr){
@@ -16,13 +17,23 @@ void* while_eval(Environment* env, WhileStmt* stmt){
 void* var_eval(Environment* env, VarTerm* term){
     return NULL;
 }
-void* constraint_eval(Environment* env, ConstraintTerm* term){
+void* constraint_eval(Environment* env, ConstantTerm* term){
     return NULL;
 }
 void* block_eval(Environment* env, BlockStmt* stmt){
     return NULL;
 }
 
+void* start_eval(Environment* env, StartTerm * stmt){
+    return NULL;
+}
+void* end_eval(Environment* env, EndTerm * stmt){
+    return NULL;
+}
+
+void* call_eval(Environment* env, CallTerm* term){
+    return NULL;
+}
 
 Eval* new_eval(void* (*eval_call)(Environment* env, void* node)){
     Eval* eval = malloc(sizeof(Eval));
@@ -31,16 +42,22 @@ Eval* new_eval(void* (*eval_call)(Environment* env, void* node)){
 }
 
 
+Tree* new_tree(struct list* list){
+    Tree* tree = malloc(sizeof(Tree));
+    tree->stmts = list;
+    return tree;
+}
+
 VarTerm* new_var_term(Token* name, void* expr){
     VarTerm* var = malloc(sizeof(VarTerm));
+    var->eval = new_eval(GET_FUN(var_eval));
     var->name = name;
     var->value = expr;
-    var->eval = new_eval(GET_FUN(var_eval));
     return var;
 }
 
-ConstraintTerm* new_constraintTerm(Token* name){
-    ConstraintTerm* constraint = malloc(sizeof(ConstraintTerm));
+ConstantTerm* new_constant_term(Token* name){
+    ConstantTerm* constraint = malloc(sizeof(ConstantTerm));
     constraint->name = name;
     constraint->eval = new_eval(GET_FUN(constraint_eval));
     return constraint;
@@ -69,4 +86,28 @@ WhileStmt* new_while_stmt(Token* name, void* expr, BlockStmt* block){
     t_while->block=block;
     t_while->eval=new_eval(GET_FUN(while_eval));
     return t_while;
+}
+
+StartTerm* new_start_term(Token* op, void* expr){
+    StartTerm* term = malloc(sizeof(StartTerm));
+    term->eval = new_eval(GET_FUN(start_eval));
+    term->op = op;
+    term->expr = expr;
+    return term;
+}
+
+EndTerm* new_end_term(Token* op, void* expr){
+    EndTerm* term = malloc(sizeof(EndTerm));
+    term->eval= new_eval(GET_FUN(end_eval));
+    term->op = op;
+    term->expr = expr;
+    return term;
+}
+
+CallTerm* new_call_term(void* expr, struct list* args){
+    CallTerm *term = malloc(sizeof(CallTerm));
+    term->expr = expr;
+    term->eval = new_eval(GET_FUN(call_eval));
+    term->args = args;
+    return term;
 }

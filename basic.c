@@ -4,8 +4,6 @@
 #include "basic.h"
 #include "log.h"
 #include "string.h"
-#include "errno.h"
-
 
 KindMeta get_kind_meta(Kind kind){
     if (kind >= 0 && kind <= 127){
@@ -24,7 +22,6 @@ KindMeta get_kind_meta(Kind kind){
     }
     return EMPTY_KIND;
 }
-
 
 void lexer_error(char *m, char *s, unsigned int row, unsigned int col){
     size_t len = strlen(s);
@@ -53,7 +50,6 @@ void print(char *s, ...){
     va_end(args1);
     printf("%s\n", buf);
 }
-
 
 void out_token(Token* token){
     print("<Kind=%s, (%d,%d)>",

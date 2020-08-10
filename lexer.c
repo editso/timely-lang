@@ -180,6 +180,9 @@ void read_all(Lexer *lexer){
             case '.':
             case ';':{
                 int op = read_char(lexer);
+                /**
+                 * ++  -- ....
+                 */
                 switch (op) {
                     case '+':
                     case '-':
