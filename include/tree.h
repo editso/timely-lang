@@ -4,13 +4,10 @@
 
 #ifndef TIMELY_LANG_TREE_H
 #define TIMELY_LANG_TREE_H
-#include "../token.h"
-#include "../list.h"
+#include "token.h"
+#include "list.h"
+#include "envir.h"
 
-
-typedef struct{
-
-}Environment;
 
 typedef struct{
     void* (*eval)(Environment* env, void* node);

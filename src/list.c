@@ -3,8 +3,8 @@
 //
 #ifndef TIMELY_LANG_LIST_C_H
 #define TIMELY_LANG_LIST_C_H
-#include "list.h"
-#include "string.h"
+#include "../include/list.h"
+#include <string.h>
 
 Node* new_node(void* data){
     Node* node = malloc(sizeof(Node));

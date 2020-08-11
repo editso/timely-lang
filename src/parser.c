@@ -1,8 +1,8 @@
 //
 // Created by zy on 8/7/20.
 //
-#include "parser.h"
-#include "ast/eval.h"
+#include "../include/parser.h"
+#include "../include/eval.h"
 
 
 
@@ -110,9 +110,10 @@ int parse(Parser *parser) {
 }
 
 
-void runner(Parser* parser){
-    GET_EVAL(parser->root)->eval(NULL, parser->root);
+void runner(Parser* parser, Environment* env){
+    GET_EVAL(parser->root)->eval(env, parser->root);
 }
+
 
 void* parse_try(Parser* parser){
     move(parser);

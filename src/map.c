@@ -1,10 +1,10 @@
 //
 // Created by zy on 8/11/20.
 //
-#include "map.h"
-#include "stdlib.h"
-#include "list.h"
-#include "stdio.h"
+#include "../include/map.h"
+#include "../include/list.h"
+#include <stdlib.h>
+#include <stdio.h>
 
 unsigned long hash(void* key){
     return key == NULL? 0: (unsigned long )key;

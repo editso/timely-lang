@@ -4,7 +4,7 @@
 
 #ifndef TIMELY_LANG_PARSER_H
 #define TIMELY_LANG_PARSER_H
-#include "ast/tree.h"
+#include "tree.h"
 #include "lexer.h"
 
 typedef struct parser{
@@ -83,6 +83,6 @@ void* parse_constant(Parser* parser);
 
 int parse(Parser* parser);
 
-void runner(Parser* parser);
+void runner(Parser* parser, Environment *env);
 
 #endif //TIMELY_LANG_PARSER_H

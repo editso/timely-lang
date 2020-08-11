@@ -7,9 +7,9 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <fcntl.h>
-#include "lexer.h"
-#include "list.h"
-#include "basic.h"
+#include "../include/lexer.h"
+#include "../include/list.h"
+#include "../include/basic.h"
 
 char c_buf_[1];
 

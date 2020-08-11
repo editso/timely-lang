@@ -1,8 +1,8 @@
 //
 // Created by zy on 8/9/20.
 //
-#include "eval.h"
-#include "../basic.h"
+#include "../include/eval.h"
+#include "../include/basic.h"
 #include "string.h"
 
 
@@ -25,7 +25,9 @@ void* while_eval(Environment* env, WhileStmt* stmt){
 
 void* var_eval(Environment* env, VarTerm* term){
     print("var_eval:%s",term->name->text);
-    return NULL;
+    void* value = GET_EVAL(term->value)->eval(env,term);
+    map_put(&env->map, term->name->text, value);
+    return value;
 }
 
 void* constant_eval(Environment* env, ConstantTerm* term){
@@ -42,7 +44,6 @@ void* constant_eval(Environment* env, ConstantTerm* term){
             abort();
     }
 }
-
 
 void* block_eval(Environment* env, BlockStmt* stmt){
     print("call: %s", __FUNCTION__ );
