@@ -33,9 +33,6 @@ void print(char *, ...);
 
 void out_token(Token* token);
 
-
-
-
 long to_number(struct list *list);
 
 

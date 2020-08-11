@@ -17,7 +17,7 @@ typedef struct node{
 struct list{
     Node* head;
     Node* tail;
-    int size;
+    unsigned int size;
 };
 
 /**
@@ -32,7 +32,7 @@ struct list* new_list();
  * @param 插入的位置
  * @param data数据 插入成功 1, 失败-1;
  */
-int list_insert(struct list*, int, void *);
+int list_insert(struct list*, unsigned int, void *);
 
 
 /**
@@ -48,7 +48,7 @@ void list_add(struct list*, void *);
  * @param i 位置
  * @return 如果有返回元素的数据,否则NULL
  */
-void* list_get(struct list*, int);
+void* list_get(struct list*, unsigned int);
 
 
 
@@ -58,7 +58,7 @@ void* list_get(struct list*, int);
  * @param i 位置
  * @return 如果删除成功返回被删除的数据,否则NULL
  */
-void* list_remove(struct list*, int);
+void* list_remove(struct list*, unsigned int);
 
 char* to_string(struct list*);
 

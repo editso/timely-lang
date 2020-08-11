@@ -17,8 +17,10 @@ typedef struct parser{
 
 Parser* new_parser(Lexer* lexer);
 
-void* parse_while(Parser* parser);
 
+void* parse_id(Parser* parser);
+void* parse_fun(Parser* parser);
+void* parse_while(Parser* parser);
 void* parse_try(Parser* parser);
 void* parse_catch(Parser* parser);
 void* parse_block(Parser* parser);

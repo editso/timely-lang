@@ -7,7 +7,7 @@
 #include <stdio.h>
 
 unsigned long hash(void* key){
-    return key == NULL? 0: (unsigned long )key;
+    return key? (unsigned long )key : 0;
 }
 
 unsigned int position(void* key, unsigned int m){
@@ -29,7 +29,7 @@ Elem* new_elem(void* key, void* value){
 Map* new_map(unsigned int size){
     Map* map = malloc(sizeof(Map));
     map->size = 0;
-    map->capacity = size <= 0 ? 10 : size;
+    map->capacity = size? size : 10;
     map->elem = malloc(sizeof(struct list) * map->capacity);
     return map;
 }

@@ -17,7 +17,11 @@ Node* new_node(void* data){
  * @return 新的 list
  */
 struct list* new_list(){
-    return malloc(sizeof(struct list));
+    struct list* list = malloc(sizeof(struct list));
+    list->size = 0;
+    list->head = NULL;
+    list->tail = NULL;
+    return list;
 }
 
 /**
@@ -35,7 +39,7 @@ void list_add(struct list* list, void *data){
  * @param 插入的位置
  * @param data数据 插入成功 1, 失败-1;
  */
-int list_insert(struct list* list, int index, void *data){
+int list_insert(struct list* list, unsigned int index, void *data){
     Node* new = new_node(data);
     // 第一个位置插入
     if (index == 0 || index == 1){
@@ -91,7 +95,7 @@ int list_insert(struct list* list, int index, void *data){
 }
 
 
-Node* list_get_(struct list* list, int index){
+Node* list_get_(struct list* list, unsigned int index){
     if (index >= list->size || index < 0){
         return NULL;
     }
@@ -113,7 +117,7 @@ Node* list_get_(struct list* list, int index){
  * @param i 位置
  * @return 如果有返回元素的数据,否则NULL
  */
-void* list_get(struct list* list, int index){
+void* list_get(struct list* list, unsigned int index){
     Node* node = list_get_(list, index);
     if (node == NULL)return NULL;
     return node->data;
@@ -125,7 +129,7 @@ void* list_get(struct list* list, int index){
  * @param i 位置
  * @return 如果删除成功返回被删除的数据,否则NULL
  */
-void* list_remove(struct list* list, int index){
+void* list_remove(struct list* list, unsigned int index){
     if (index >= list->size){
         return NULL;
     }

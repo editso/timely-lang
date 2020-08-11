@@ -5,8 +5,6 @@
 #include "../include/eval.h"
 
 
-
-
 void move(Parser *parser) {
     parser->token = lexer_read(parser->lexer);
 }
@@ -40,7 +38,6 @@ void match_end(Parser* parser){
               token->text);
         abort();
     }
-    move(parser);
 }
 
 struct parser *new_parser(Lexer *lexer) {
@@ -56,46 +53,19 @@ void *parse_stmt(Parser *parser) {
     switch ((token = GET_TOKEN(parser))->kind) {
         case COMM:
             move(parser);
-        case ID: {
-            if (peek(parser, 0)->kind == EQ){
-                move(parser);
-                move(parser);
-                void* var = new_var_term(token, parse_expr(parser));
-                match_end(parser);
-                return var;
-            }
-            out_token(token);
-            return parse_expr(parser);
-        }
-        case FUN:{
-            move(parser);
-            struct list *args = new_list();
-            if (peek(parser,0)->kind != OP_FL_BRA){
-                match(parser, OP_BRA);
-                while (GET_TOKEN(parser)->kind != CL_BRA){
-                    if (GET_TOKEN(parser)->kind == COMM){
-                        move(parser);
-                        continue;
-                    }
-                    list_add(args, parse_expr(parser));
-                }
-                match(parser, CL_BRA);
-            }else{
-                move(parser);
-            }
-            out_token(GET_TOKEN(parser));
-            return new_fun_stmt(token,args, parse_block(parser));
-        }
+        case ID:
+            return parse_id(parser);
+        case FUN:
+            return parse_fun(parser);
         case WHILE:
             return parse_while(parser);
         case TRY:
             return parse_try(parser);
         case SEMI:
-            return new_empty(token);
         case NEWLINE:
-            return new_empty(GET_TOKEN(parser));
+            return new_empty(token);
         default:
-            out_token(GET_TOKEN(parser));
+//            out_token(GET_TOKEN(parser));
             return NULL;
     }
 }
@@ -114,6 +84,45 @@ void runner(Parser* parser, Environment* env){
     GET_EVAL(parser->root)->eval(env, parser->root);
 }
 
+void* parse_fun(Parser* parser){
+    Token *token = GET_TOKEN(parser);
+    move(parser);
+    struct list *args = new_list();
+    if (peek(parser,0)->kind != OP_FL_BRA){
+        move(parser);
+        match(parser, OP_BRA);
+        while (GET_TOKEN(parser)->kind != CL_BRA){
+            if (GET_TOKEN(parser)->kind == COMM){
+                move(parser);
+                continue;
+            }
+            list_add(args, parse_expr(parser));
+        }
+        match(parser, CL_BRA);
+    }else{
+        move(parser);
+    }
+    return new_fun_stmt(token,args, parse_block(parser));
+}
+
+void* parse_id(Parser* parser){
+    Token *token = GET_TOKEN(parser);
+    Token* peek_token = peek(parser, 0);
+    switch (peek_token->kind) {
+        case EQ:{
+            move(parser);
+            move(parser);
+            void* var = new_var_term(token, parse_expr(parser));
+            match_end(parser);
+            return var;
+        }
+        case NEWLINE:
+        case COMM:
+            return new_var_term(token, NULL);
+        default:
+            return parse_expr(parser);
+    }
+}
 
 void* parse_try(Parser* parser){
     move(parser);
@@ -127,7 +136,6 @@ void* parse_try(Parser* parser){
         move(parser);
         stmt  = parse_block(parser);
     }
-    match_end(parser);
     return new_try_stmt(block, stmts, stmt);
 }
 
@@ -331,9 +339,7 @@ void *parse_start(Parser *parser) {
  * a++, b--, (), .
  */
 void *parse_end(Parser *parser) {
-
     void* left = parse_constant(parser);
-
     Token* token = GET_TOKEN(parser);
     while (t_true){
         switch (token->kind) {
@@ -376,6 +382,8 @@ void *parse_constant(Parser *parser) {
     Token* token = GET_TOKEN(parser);
     switch (token->kind) {
         case ID:
+            move(parser);
+            return new_var_term(token, NULL);
         case NUMBER:
         case STRING:
             move(parser);

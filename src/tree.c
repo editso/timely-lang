@@ -17,17 +17,17 @@ void* binary_eval(Environment* env, BinaryExpr* expr){
 
 void* while_eval(Environment* env, WhileStmt* stmt){
     print("call: %s", __FUNCTION__ );
-    while (GET_EVAL(stmt->expr)->eval(env, stmt->expr)){
-        GET_EVAL(stmt->block)->eval(env, stmt->block);
-    }
+//    while (GET_EVAL(stmt->expr)->eval(env, stmt->expr)){
+//        GET_EVAL(stmt->block)->eval(env, stmt->block);
+//    }
     return NULL;
 }
 
 void* var_eval(Environment* env, VarTerm* term){
-    print("var_eval:%s",term->name->text);
-    void* value = GET_EVAL(term->value)->eval(env,term);
-    map_put(&env->map, term->name->text, value);
-    return value;
+    print("call: %s", __FUNCTION__ );
+//    void* value = GET_EVAL(term->value)->eval(env,term);
+//    map_put(&env->map, term->name->text, value);
+    return NULL;
 }
 
 void* constant_eval(Environment* env, ConstantTerm* term){
@@ -74,10 +74,10 @@ void* call_eval(Environment* env, CallTerm* term){
     struct list *args = term->args;
     void* stmt;
     char buff[1024];
-    for (int i = 0; i < args->size; ++i) {
-        stmt = list_get(args,i);
-        strcat(buff, GET_EVAL(stmt)->eval(env,stmt));
-    }
+//    for (int i = 0; i < args->size; ++i) {
+//        stmt = list_get(args,i);
+//        strcat(buff, GET_EVAL(stmt)->eval(env,stmt));
+//    }
     if (strcmp("print", constant->name->text) == 0){
         print("%s", buff);
     }
@@ -87,7 +87,7 @@ void* call_eval(Environment* env, CallTerm* term){
 
 
 void* empty_eval(Environment* env, EmptyStmt* term){
-    print("call: %s", __FUNCTION__ );
+
     return NULL;
 }
 
@@ -97,7 +97,7 @@ void* fun_eval(Environment* env, FunStmt* fun){
 
 
 void* tree_eval(Environment* env, Tree* eval){
-    print("call: %s", __FUNCTION__ );
+//    print("call: %s", __FUNCTION__ );
     struct list* stmts = eval->stmts;
     void* node;
     for (int i = 0; i < stmts->size; ++i) {
