@@ -92,6 +92,44 @@ typedef struct {
     void* block;
 }FunStmt;
 
+typedef struct{
+    Eval eval;
+    void* expr;
+    void* block;
+}CatchStmt;
+
+
+typedef struct {
+    Eval eval;
+
+    /**
+     * try{
+     *
+     * }
+     */
+    void* block;
+    /**
+     * try{
+     *
+     * }catch(){
+     *
+     * }catch(){
+     *
+     * }
+     */
+    struct list* stmts;
+    /**
+     * try{
+     *
+     * }catch{
+     *
+     * }finally{
+     *
+     * }
+     */
+    void* stmt;
+}TryStmt;
+
 
 Tree* new_tree(struct list* list);
 
@@ -114,4 +152,8 @@ EmptyStmt* new_empty(Token *op);
 FunStmt* new_fun_stmt(Token* name, struct list* args, void* block);
 
 CallTerm* new_call_term(void* expr, struct list* args);
+
+TryStmt* new_try_stmt(void* block, struct list *stmts, void* finally);
+
+CatchStmt* new_catch_stmt(void* expr, void* block);
 #endif //TIMELY_LANG_TREE_H

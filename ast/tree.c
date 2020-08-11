@@ -6,19 +6,22 @@
 #include "string.h"
 
 
+
+
 void* binary_eval(Environment* env, BinaryExpr* expr){
+    print("call: %s", __FUNCTION__ );
     GET_EVAL(expr->left)->eval(env, expr->left);
     GET_EVAL(expr->right)->eval(env,expr->right);
     return NULL;
 }
 
 void* while_eval(Environment* env, WhileStmt* stmt){
+    print("call: %s", __FUNCTION__ );
     while (GET_EVAL(stmt->expr)->eval(env, stmt->expr)){
         GET_EVAL(stmt->block)->eval(env, stmt->block);
     }
     return NULL;
 }
-
 
 void* var_eval(Environment* env, VarTerm* term){
     print("var_eval:%s",term->name->text);
@@ -26,6 +29,7 @@ void* var_eval(Environment* env, VarTerm* term){
 }
 
 void* constant_eval(Environment* env, ConstantTerm* term){
+    print("call: %s", __FUNCTION__ );
     switch (term->name->kind) {
         case NUMBER:
             return atol(term->name->text);
@@ -40,6 +44,7 @@ void* constant_eval(Environment* env, ConstantTerm* term){
 }
 
 void* block_eval(Environment* env, BlockStmt* stmt){
+    print("call: %s", __FUNCTION__ );
     struct list *comm = stmt->stmts;
     void* node;
     for (int i = 0; i < comm->size; ++i) {
@@ -51,15 +56,18 @@ void* block_eval(Environment* env, BlockStmt* stmt){
 }
 
 void* start_eval(Environment* env, StartTerm * stmt){
+    print("call: %s", __FUNCTION__ );
     return NULL;
 }
 
 void* end_eval(Environment* env, EndTerm * stmt){
+    print("call: %s", __FUNCTION__ );
     return NULL;
 }
 
 
 void* call_eval(Environment* env, CallTerm* term){
+    print("call: %s", __FUNCTION__ );
     ConstantTerm* constant = term->expr;
     struct list *args = term->args;
     void* stmt;
@@ -76,18 +84,28 @@ void* call_eval(Environment* env, CallTerm* term){
 
 
 void* empty_eval(Environment* env, EmptyStmt* term){
-
+    print("call: %s", __FUNCTION__ );
     return NULL;
 }
 
 void* fun_eval(Environment* env, FunStmt* fun){
-
+    print("call: %s", __FUNCTION__ );
 }
 
 
 
 void* tree_eval(Environment* env, Tree* eval){
+    print("call: %s", __FUNCTION__ );
+}
 
+void* try_eval(Environment* env, TryStmt* stmt){
+    print("call: %s", __FUNCTION__ );
+
+
+
+}
+void* catch_eval(Environment* env, CatchStmt* stmt){
+    print("call: %s", __FUNCTION__ );
 }
 
 
@@ -96,6 +114,7 @@ Eval* new_eval(void* (*eval_call)(Environment* env, void* node)){
     eval->eval = eval_call;
     return eval;
 }
+
 
 Tree* new_tree(struct list* list){
     Tree* tree = malloc(sizeof(Tree));
@@ -182,4 +201,21 @@ FunStmt* new_fun_stmt(Token* name, struct list* args, void* block){
     fun->args = args;
     fun->block = block;
     return fun;
+}
+
+TryStmt* new_try_stmt(void* block, struct list *stmts, void* finally){
+    TryStmt* stmt = malloc(sizeof(TryStmt));
+    stmt->eval = *new_eval(GET_FUN(tree_eval));
+    stmt->block = block;
+    stmt->stmts = stmts;
+    stmt->stmt = finally;
+    return stmt;
+}
+
+CatchStmt* new_catch_stmt(void* expr, void* block){
+    CatchStmt* stmt = malloc(sizeof(CatchStmt));
+    stmt->eval = *new_eval(GET_FUN(catch_eval));
+    stmt->expr = expr;
+    stmt->block = block;
+    return stmt;
 }

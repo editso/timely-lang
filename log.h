@@ -14,7 +14,5 @@ void lexer_error(char *m, char *s, unsigned int row, unsigned int col);
 void parser_error(char *m,char *s, Token* token);
 
 
-void info(char *mat, ...);
-
 
 #endif //TIMELY_LANG_LOG_H

@@ -17,7 +17,11 @@ Token* peek(Parser* parser, int index){
 
 void match(Parser *parser, Kind kind) {
     if (kind != GET_TOKEN(parser)->kind) {
-        print("需要: %s, 出现: %s", get_kind_meta(kind).name, GET_TOKEN(parser)->text);
+        fprintf(stderr,"需要: %s, 出现: %s: (%d,%d)",
+              get_kind_meta(kind).name,
+              get_kind_meta(GET_TOKEN(parser)->kind).name,
+              parser->token->row_pos,
+              parser->token->col_pos);
         abort();
     }
     move(parser);
@@ -29,10 +33,11 @@ void match(Parser *parser, Kind kind) {
 void match_end(Parser* parser){
     Token* token = GET_TOKEN(parser);
     if (token->kind != NEWLINE && token->kind != SEMI && token->kind != END){
-        print("在第 %d 行结尾需要 ';' 或另起一行(%d,%d)",
+        print("在第 %d 行结尾需要 ';' 或另起一行(%d,%d),当前: %s",
               token->row_pos,
               token->row_pos,
-              token->col_pos);
+              token->col_pos,
+              token->text);
         abort();
     }
     move(parser);
@@ -49,8 +54,6 @@ struct parser *new_parser(Lexer *lexer) {
 void *parse_stmt(Parser *parser) {
     Token *token;
     switch ((token = GET_TOKEN(parser))->kind) {
-        case SEMI:
-            return new_empty(token);
         case COMM:
             move(parser);
         case ID: {
@@ -61,36 +64,46 @@ void *parse_stmt(Parser *parser) {
                 match_end(parser);
                 return var;
             }
+            out_token(token);
             return parse_expr(parser);
         }
         case FUN:{
             move(parser);
-            match(parser, OP_BRA);
             struct list *args = new_list();
-            while (GET_TOKEN(parser)->kind != CL_BRA){
-                if (GET_TOKEN(parser)->kind == COMM){
-                    move(parser);
-                    continue;
+            if (peek(parser,0)->kind != OP_FL_BRA){
+                match(parser, OP_BRA);
+                while (GET_TOKEN(parser)->kind != CL_BRA){
+                    if (GET_TOKEN(parser)->kind == COMM){
+                        move(parser);
+                        continue;
+                    }
+                    list_add(args, parse_expr(parser));
                 }
-                list_add(args, parse_expr(parser));
+                match(parser, CL_BRA);
+            }else{
+                move(parser);
             }
-            match(parser, CL_BRA);
+            out_token(GET_TOKEN(parser));
             return new_fun_stmt(token,args, parse_block(parser));
         }
         case WHILE:
             return parse_while(parser);
+        case TRY:
+            return parse_try(parser);
+        case SEMI:
+            return new_empty(token);
+        case NEWLINE:
+            return new_empty(GET_TOKEN(parser));
         default:
             out_token(GET_TOKEN(parser));
             return NULL;
     }
 }
 
-
 int parse(Parser *parser) {
     move(parser);
     while (GET_TOKEN(parser)->kind != END) {
-//        list_add(parser->root->stmts, parse_stmt(parser));
-        out_token(GET_TOKEN(parser));
+        list_add(parser->root->stmts, parse_stmt(parser));
         move(parser);
     }
     return -1;
@@ -101,6 +114,31 @@ void runner(Parser* parser){
     GET_EVAL(parser->root)->eval(NULL, parser->root);
 }
 
+void* parse_try(Parser* parser){
+    move(parser);
+    void* block = parse_block(parser);
+    struct list *stmts = new_list();
+    while (GET_TOKEN(parser)->kind == CATCH){
+        list_add(stmts, parse_catch(parser));
+    }
+    void* stmt = NULL;
+    if (GET_TOKEN(parser)->kind == FINALLY){
+        move(parser);
+        stmt  = parse_block(parser);
+    }
+    match_end(parser);
+    return new_try_stmt(block, stmts, stmt);
+}
+
+
+void* parse_catch(Parser* parser){
+    move(parser);
+    match(parser, ID);
+    ConstantTerm * var = new_constant_term(GET_TOKEN(parser));
+    void* block = parse_block(parser);
+    return new_catch_stmt(var, block);
+}
+
 
 void *parse_while(Parser *parser) {
     Token *token = GET_TOKEN(parser);
@@ -108,10 +146,9 @@ void *parse_while(Parser *parser) {
     match(parser, OP_BRA);
     void* expr = parse_expr(parser);
     match(parser, CL_BRA);
-    match_end(parser);
-    return new_while_stmt(token, expr, parse_block(parser));
+    void* stmt = new_while_stmt(token, expr, parse_block(parser));
+    return stmt;
 }
-
 
 void *parse_block(Parser *parser) {
     match(parser, OP_FL_BRA);
@@ -121,7 +158,6 @@ void *parse_block(Parser *parser) {
         move(parser);
     }
     match(parser, CL_FL_BRA);
-    match_end(parser);
     return new_block_stmt(stmts);
 }
 
@@ -289,14 +325,14 @@ void *parse_start(Parser *parser) {
     }
 }
 
-
-
 /**
  * 后缀表达式
  * a++, b--, (), .
  */
 void *parse_end(Parser *parser) {
+
     void* left = parse_constant(parser);
+
     Token* token = GET_TOKEN(parser);
     while (t_true){
         switch (token->kind) {
@@ -313,10 +349,16 @@ void *parse_end(Parser *parser) {
                     if (GET_TOKEN(parser)->kind == COMM){
                         move(parser);
                         continue;
+                    }else if (GET_TOKEN(parser)->kind == CL_BRA){
+                        break;
                     }
                     list_add(args, parse_expr(parser));
-                }while (GET_TOKEN(parser)->kind !=  CL_BRA);
+                    if (GET_TOKEN(parser)->kind == CL_BRA){
+                        break;
+                    }
+                }while (t_true);
                 match(parser, CL_BRA);
+                match_end(parser);
                 return new_call_term(left, args);
             }
             case DOT:
@@ -338,7 +380,8 @@ void *parse_constant(Parser *parser) {
             move(parser);
             return new_constant_term(token);
         default:
-            print("无法解析的表达式: %s",token->text);
+            printf("无法解析的表达式: %s, ",token->text);
+            out_token(token);
             abort();
     }
 }

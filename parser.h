@@ -19,6 +19,8 @@ Parser* new_parser(Lexer* lexer);
 
 void* parse_while(Parser* parser);
 
+void* parse_try(Parser* parser);
+void* parse_catch(Parser* parser);
 void* parse_block(Parser* parser);
 
 void* parse_expr(Parser* parser);

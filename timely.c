@@ -21,8 +21,7 @@ int main(int argc, char **argv) {
         parse(parser);
         runner(parser);
     }catch(4 || 1==1){
-        perror("error");
-        printf("断错误,程序结束:%d", errno);
+        print("遇到错误,程序结束:%d", errno);
     }
     return 0;
 }

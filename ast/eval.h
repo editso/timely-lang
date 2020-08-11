@@ -6,6 +6,7 @@
 #define TIMELY_LANG_EVAL_H
 #include "tree.h"
 
+Eval* new_eval(void* (*eval_call)(Environment* env, void* node));
 void* binary_eval(Environment* env, BinaryExpr* expr);
 void* while_eval(Environment* env, WhileStmt* stmt);
 void* var_eval(Environment* env, VarTerm* term);
@@ -17,7 +18,8 @@ void* call_eval(Environment* env, CallTerm* term);
 void* empty_eval(Environment* env, EmptyStmt* term);
 void* fun_eval(Environment* env, FunStmt* fun);
 void* tree_eval(Environment* env, Tree* eval);
-Eval* new_eval(void* (*eval_call)(Environment* env, void* node));
+void* try_eval(Environment* env, TryStmt* stmt);
+void* catch_eval(Environment* env, CatchStmt* stmt);
 
 
 #endif //TIMELY_LANG_EVAL_H

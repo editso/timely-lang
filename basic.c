@@ -6,7 +6,7 @@
 #include "string.h"
 
 KindMeta get_kind_meta(Kind kind){
-    if (kind >= 0 && kind <= 127){
+    if (kind != NEWLINE && kind >= 0 && kind <= 127){
         KindMeta* meta = malloc(sizeof(KindMeta));
         char* s = malloc(sizeof(s));
         *s = (char)kind;
@@ -38,6 +38,12 @@ void lexer_error(char *m, char *s, unsigned int row, unsigned int col){
     fprintf(stderr,"%s%s%s\n",n_buff,s,buff);
     abort();
 }
+
+
+void parser_error(char *m,char *s, Token* token){
+    lexer_error(m, s, token->row_pos, token->col_pos);
+}
+
 
 void print(char *s, ...){
     va_list args;

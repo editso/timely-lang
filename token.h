@@ -123,7 +123,9 @@ static const KindMeta kind_table[] = {
         {FINALLY, "finally"},
         {CLASS, "class"},
         {ARROW_FUN, "=>"},
-        {SUPER, "super"}
+        {SUPER, "super"},
+        {ID,"<标识符>"},
+        {NEWLINE, "<New Line>"}
 };
 
 /**
