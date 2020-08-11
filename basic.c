@@ -70,6 +70,7 @@ void out_token(Token* token){
 }
 
 
+
 long to_number(struct list *list){
     char *buf = malloc(sizeof(char) * list->size);
     // 11110

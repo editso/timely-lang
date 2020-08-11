@@ -146,7 +146,9 @@ void* list_remove(struct list* list, int index){
         node->next->prev = node->prev;
     }
     list->size --;
-    return node->data;
+    void* data = node->data;
+    free(node);
+    return data;
 }
 
 char* to_string(struct list* list){

@@ -43,6 +43,7 @@ void* constant_eval(Environment* env, ConstantTerm* term){
     }
 }
 
+
 void* block_eval(Environment* env, BlockStmt* stmt){
     print("call: %s", __FUNCTION__ );
     struct list *comm = stmt->stmts;
@@ -79,6 +80,7 @@ void* call_eval(Environment* env, CallTerm* term){
     if (strcmp("print", constant->name->text) == 0){
         print("%s", buff);
     }
+
     return NULL;
 }
 
@@ -93,10 +95,17 @@ void* fun_eval(Environment* env, FunStmt* fun){
 }
 
 
-
 void* tree_eval(Environment* env, Tree* eval){
     print("call: %s", __FUNCTION__ );
+    struct list* stmts = eval->stmts;
+    void* node;
+    for (int i = 0; i < stmts->size; ++i) {
+        node = list_get(stmts, i);
+        GET_EVAL(node)->eval(NULL,node);
+    }
+    return NULL;
 }
+
 
 void* try_eval(Environment* env, TryStmt* stmt){
     print("call: %s", __FUNCTION__ );
@@ -205,7 +214,7 @@ FunStmt* new_fun_stmt(Token* name, struct list* args, void* block){
 
 TryStmt* new_try_stmt(void* block, struct list *stmts, void* finally){
     TryStmt* stmt = malloc(sizeof(TryStmt));
-    stmt->eval = *new_eval(GET_FUN(tree_eval));
+    stmt->eval = *new_eval(GET_FUN(try_eval));
     stmt->block = block;
     stmt->stmts = stmts;
     stmt->stmt = finally;

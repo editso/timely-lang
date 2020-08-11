@@ -20,6 +20,4 @@ void* fun_eval(Environment* env, FunStmt* fun);
 void* tree_eval(Environment* env, Tree* eval);
 void* try_eval(Environment* env, TryStmt* stmt);
 void* catch_eval(Environment* env, CatchStmt* stmt);
-
-
 #endif //TIMELY_LANG_EVAL_H

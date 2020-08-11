@@ -26,6 +26,8 @@
 #define throw(buff,v) longjmp(buff,v);
 #endif
 
+unsigned long hash(void* key);
+
 void print(char *, ...);
 
 
