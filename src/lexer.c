@@ -4,21 +4,18 @@
 
 #include <string.h>
 #include <stdio.h>
-#include <unistd.h>
 #include <stdlib.h>
-#include <fcntl.h>
 #include "../include/lexer.h"
 #include "../include/list.h"
 #include "../include/basic.h"
 
 char c_buf_[1];
-
 int read_char(struct lexer* lexer){
     if (lexer->last_chr == EMPTY){
         bzero(c_buf_, sizeof(c_buf_));
         lexer->col_pos++;
-        if (read(lexer->fd, c_buf_, sizeof(c_buf_)) <= 0){
-            close(lexer->fd); // 关流
+        if (fread(c_buf_, sizeof(c_buf_), 1,lexer->file) <= 0){
+            fclose(lexer->file); // 关流
             lexer->also = t_false;
             return END;
         }
@@ -142,7 +139,6 @@ Token* new_token(struct lexer* lexer, int kind, char *text){
 }
 
 
-
 Token* new_end_token(){
     Token* token = malloc(sizeof(Token));
     token->kind = END;
@@ -258,7 +254,7 @@ t_bool fill_list(Lexer* lexer, int index){
 Lexer* new_lexer(char *file){
     struct lexer *lexer = malloc(sizeof(struct lexer));
     lexer->tokens = malloc(sizeof(struct list));
-    if ((lexer->fd = open(file, O_RDONLY)) <= 0){
+    if ((lexer->file = fopen(file, "r")) == NULL){
         perror("timely");
         exit(0);
     }

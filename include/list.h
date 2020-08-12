@@ -60,6 +60,10 @@ void* list_get(struct list*, unsigned int);
  */
 void* list_remove(struct list*, unsigned int);
 
+/**
+ * tostring
+ * @return string
+ */
 char* to_string(struct list*);
 
 #endif //TIMELY_LANG_LIST_H

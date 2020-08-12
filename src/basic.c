@@ -69,15 +69,3 @@ void out_token(Token* token){
           token->col_pos);
 }
 
-
-
-long to_number(struct list *list){
-    char *buf = malloc(sizeof(char) * list->size);
-    // 11110
-    for (int i = 0; i < list->size; ++i) {
-        buf[i] = *(char*)list_get(list, i);
-    }
-    long *n=malloc(sizeof(long));
-    memcpy(n, buf, list->size);
-    return *n;
-}

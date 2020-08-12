@@ -45,15 +45,15 @@ typedef enum {
 
     MUL        = 42, // *
     ADD        = 43, // +
-    MIN        = 45, // -
+    SUB        = 45, // -
     DIV        = 47, // /
 
     MUL_EQ     = 170, // *=
     ADD_EQ     = 171, // +=
-    MIN_EQ     = 172, // -=
+    SUB_EQ     = 172, // -=
     DIV_EQ     = 173, // /=
     ADD2       = 174, // ++
-    MIN2       = 175, // --
+    SUB2       = 175, // --
 
     LE         = 60, // <
     EQ         = 61, // =
@@ -93,14 +93,14 @@ typedef struct{
 
 static const KindMeta kind_table[] = {
         {ADD2,   "++"},
+        {SUB2,   "--"},
         {EQ2,    "=="},
         {ADD_EQ, "+="},
         {AND_EQ, "&="},
         {OR_EQ,  "|="},
         {MUL_EQ, "*="},
         {DIV_EQ, "/="},
-        {MIN_EQ, "-="},
-        {MIN2,   "--"},
+        {SUB_EQ, "-="},
         {MOD_EQ, "%="},
         {XOR_EQ, "^="},
         {LE_EQ,  "<="},

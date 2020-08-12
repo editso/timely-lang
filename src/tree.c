@@ -4,19 +4,18 @@
 #include "../include/eval.h"
 #include "../include/basic.h"
 #include "string.h"
-
-
-
+#include "stdlib.h"
 
 void* binary_eval(Environment* env, BinaryExpr* expr){
-    print("call: %s", __FUNCTION__ );
+    print("二元运算: %s", __FUNCTION__ );
     GET_EVAL(expr->left)->eval(env, expr->left);
     GET_EVAL(expr->right)->eval(env,expr->right);
+
     return NULL;
 }
 
 void* while_eval(Environment* env, WhileStmt* stmt){
-    print("call: %s", __FUNCTION__ );
+    print("while循环: %s", __FUNCTION__ );
 //    while (GET_EVAL(stmt->expr)->eval(env, stmt->expr)){
 //        GET_EVAL(stmt->block)->eval(env, stmt->block);
 //    }
@@ -24,14 +23,14 @@ void* while_eval(Environment* env, WhileStmt* stmt){
 }
 
 void* var_eval(Environment* env, VarTerm* term){
-    print("call: %s", __FUNCTION__ );
+    print("变量声明: %s", __FUNCTION__ );
 //    void* value = GET_EVAL(term->value)->eval(env,term);
 //    map_put(&env->map, term->name->text, value);
     return NULL;
 }
 
 void* constant_eval(Environment* env, ConstantTerm* term){
-    print("call: %s", __FUNCTION__ );
+    print("常量: %s", __FUNCTION__ );
     switch (term->name->kind) {
         case NUMBER:
             return atol(term->name->text);
@@ -46,7 +45,7 @@ void* constant_eval(Environment* env, ConstantTerm* term){
 }
 
 void* block_eval(Environment* env, BlockStmt* stmt){
-    print("call: %s", __FUNCTION__ );
+    print("代码块: %s", __FUNCTION__ );
     struct list *comm = stmt->stmts;
     void* node;
     for (int i = 0; i < comm->size; ++i) {
@@ -58,43 +57,28 @@ void* block_eval(Environment* env, BlockStmt* stmt){
 }
 
 void* start_eval(Environment* env, StartTerm * stmt){
-    print("call: %s", __FUNCTION__ );
+    print("前缀表达式: %s", __FUNCTION__ );
     return NULL;
 }
 
 void* end_eval(Environment* env, EndTerm * stmt){
-    print("call: %s", __FUNCTION__ );
+    print("后缀表达式: %s", __FUNCTION__ );
     return NULL;
 }
 
 
 void* call_eval(Environment* env, CallTerm* term){
-    print("call: %s", __FUNCTION__ );
+    print("函数调用: %s", __FUNCTION__ );
     ConstantTerm* constant = term->expr;
     struct list *args = term->args;
-    void* stmt;
     char buff[1024];
-//    for (int i = 0; i < args->size; ++i) {
-//        stmt = list_get(args,i);
-//        strcat(buff, GET_EVAL(stmt)->eval(env,stmt));
-//    }
-    if (strcmp("print", constant->name->text) == 0){
-        print("%s", buff);
-    }
-
-    return NULL;
-}
-
-
-void* empty_eval(Environment* env, EmptyStmt* term){
-
     return NULL;
 }
 
 void* fun_eval(Environment* env, FunStmt* fun){
-    print("call: %s", __FUNCTION__ );
+    print("方法声明: %s", __FUNCTION__ );
+    return NULL;
 }
-
 
 void* tree_eval(Environment* env, Tree* eval){
 //    print("call: %s", __FUNCTION__ );
@@ -102,22 +86,24 @@ void* tree_eval(Environment* env, Tree* eval){
     void* node;
     for (int i = 0; i < stmts->size; ++i) {
         node = list_get(stmts, i);
-        GET_EVAL(node)->eval(NULL,node);
+        GET_EVAL(node)->eval(env,node);
     }
     return NULL;
 }
 
-
 void* try_eval(Environment* env, TryStmt* stmt){
-    print("call: %s", __FUNCTION__ );
-
-
-
+    print("异常捕获: %s", __FUNCTION__ );
+    return NULL;
 }
+
 void* catch_eval(Environment* env, CatchStmt* stmt){
     print("call: %s", __FUNCTION__ );
+    return NULL;
 }
 
+void* empty_eval(Environment* env, EmptyStmt* term){
+    return NULL;
+}
 
 Eval* new_eval(void* (*eval_call)(Environment* env, void* node)){
     Eval* eval = malloc(sizeof(Eval));
@@ -194,6 +180,9 @@ CallTerm* new_call_term(void* expr, struct list* args){
     term->expr = expr;
     term->eval = *new_eval(GET_FUN(call_eval));
     term->args = args;
+
+
+
     return term;
 }
 

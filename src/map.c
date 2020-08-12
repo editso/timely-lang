@@ -86,3 +86,4 @@ void* map_remove(Map* map, void* key){
     map->size--;
     return value;
 }
+

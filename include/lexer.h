@@ -7,10 +7,11 @@
 #include "basic.h"
 #include "token.h"
 #include "list.h"
+#include "stdio.h"
 
 
 typedef struct lexer{
-    int fd;
+    FILE *file;
     unsigned int col_pos;
     unsigned int row_pos;
     int last_chr; // 最后一次的位置

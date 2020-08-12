@@ -2,7 +2,6 @@
 // Created by zy on 8/7/20.
 //
 #include "../include/parser.h"
-#include "../include/eval.h"
 
 
 void move(Parser *parser) {
@@ -47,7 +46,6 @@ struct parser *new_parser(Lexer *lexer) {
     return parser;
 }
 
-
 void *parse_stmt(Parser *parser) {
     Token *token;
     switch ((token = GET_TOKEN(parser))->kind) {
@@ -65,23 +63,51 @@ void *parse_stmt(Parser *parser) {
         case NEWLINE:
             return new_empty(token);
         default:
-//            out_token(GET_TOKEN(parser));
-            return NULL;
+            return parse_expr(parser);
     }
 }
 
-int parse(Parser *parser) {
+Tree* parse(Parser *parser) {
     move(parser);
     while (GET_TOKEN(parser)->kind != END) {
         list_add(parser->root->stmts, parse_stmt(parser));
         move(parser);
     }
-    return -1;
+    return parser->root;
 }
 
+void *parse_block(Parser *parser) {
+    match(parser, OP_FL_BRA);
+    struct list *stmts = new_list();
+    while (GET_TOKEN(parser)->kind != CL_FL_BRA){
+        list_add(stmts, parse_stmt(parser));
+        move(parser);
+    }
+    match(parser, CL_FL_BRA);
+    return new_block_stmt(stmts);
+}
 
-void runner(Parser* parser, Environment* env){
-    GET_EVAL(parser->root)->eval(env, parser->root);
+void *parse_expr(Parser *parser) {
+    void* left = parse_or(parser);
+    Token* token = GET_TOKEN(parser);
+    while (t_true){
+        // 解析二元表达式
+        switch (token->kind) {
+            case ADD:
+            case SUB:
+            case ADD_EQ:
+            case SUB_EQ:
+            case DIV_EQ:
+            case DIV:
+            case MUL:
+            case MOD:
+                token = GET_TOKEN(parser);
+                move(parser);
+                return new_binary_expr(left, token, parse_or(parser));
+            default:
+                return left;
+        }
+    }
 }
 
 void* parse_fun(Parser* parser){
@@ -124,6 +150,14 @@ void* parse_id(Parser* parser){
     }
 }
 
+void* parse_catch(Parser* parser){
+    move(parser);
+    match(parser, ID);
+    ConstantTerm * var = new_constant_term(GET_TOKEN(parser));
+    void* block = parse_block(parser);
+    return new_catch_stmt(var, block);
+}
+
 void* parse_try(Parser* parser){
     move(parser);
     void* block = parse_block(parser);
@@ -140,15 +174,6 @@ void* parse_try(Parser* parser){
 }
 
 
-void* parse_catch(Parser* parser){
-    move(parser);
-    match(parser, ID);
-    ConstantTerm * var = new_constant_term(GET_TOKEN(parser));
-    void* block = parse_block(parser);
-    return new_catch_stmt(var, block);
-}
-
-
 void *parse_while(Parser *parser) {
     Token *token = GET_TOKEN(parser);
     move(parser);
@@ -159,40 +184,8 @@ void *parse_while(Parser *parser) {
     return stmt;
 }
 
-void *parse_block(Parser *parser) {
-    match(parser, OP_FL_BRA);
-    struct list *stmts = new_list();
-    while (GET_TOKEN(parser)->kind != CL_FL_BRA){
-        list_add(stmts, parse_stmt(parser));
-        move(parser);
-    }
-    match(parser, CL_FL_BRA);
-    return new_block_stmt(stmts);
-}
 
 
-void *parse_expr(Parser *parser) {
-    void* left = parse_or(parser);
-    Token* token = GET_TOKEN(parser);
-    while (t_true){
-        // 解析二元表达式
-        switch (token->kind) {
-            case ADD:
-            case MIN:
-            case ADD_EQ:
-            case MIN_EQ:
-            case DIV_EQ:
-            case DIV:
-            case MUL:
-            case MOD:
-                token = GET_TOKEN(parser);
-                move(parser);
-                return new_binary_expr(left, token, parse_or(parser));
-            default:
-                return left;
-        }
-    }
-}
 
 /**
  * |
@@ -282,7 +275,7 @@ void *parse_add_sub(Parser *parser) {
     while (t_true){
         switch (token->kind) {
             case ADD:
-            case MIN:
+            case SUB:
                 token = GET_TOKEN(parser);
                 move(parser);
                 return new_binary_expr(left, token, parse_mul_div(parser));
@@ -323,7 +316,7 @@ void *parse_start(Parser *parser) {
     while (t_true){
         switch (GET_TOKEN(parser)->kind) {
             case ADD2:
-            case MIN2:
+            case SUB2:
             case EM:
                 token = GET_TOKEN(parser);
                 move(parser);
@@ -344,7 +337,7 @@ void *parse_end(Parser *parser) {
     while (t_true){
         switch (token->kind) {
             case ADD2:
-            case MIN2:{
+            case SUB2:{
                 move(parser);
                 return new_end_term(token, left);
             }
@@ -394,3 +387,4 @@ void *parse_constant(Parser *parser) {
             abort();
     }
 }
+

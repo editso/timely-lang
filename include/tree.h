@@ -8,7 +8,6 @@
 #include "list.h"
 #include "envir.h"
 
-
 typedef struct{
     void* (*eval)(Environment* env, void* node);
 }Eval;
@@ -127,7 +126,6 @@ typedef struct {
     void* stmt;
 }TryStmt;
 
-
 Tree* new_tree(struct list* list);
 
 VarTerm* new_var_term(Token* name, void* expr);
@@ -153,4 +151,6 @@ CallTerm* new_call_term(void* expr, struct list* args);
 TryStmt* new_try_stmt(void* block, struct list *stmts, void* finally);
 
 CatchStmt* new_catch_stmt(void* expr, void* block);
+
+
 #endif //TIMELY_LANG_TREE_H
