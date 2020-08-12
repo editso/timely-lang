@@ -111,6 +111,10 @@ Eval* new_eval(void* (*eval_call)(Environment* env, void* node)){
     return eval;
 }
 
+void* class_eval(Environment* env, ClassStmt* stmt){
+    print("类定义: %s", __FUNCTION__ );
+    return NULL;
+}
 
 Tree* new_tree(struct list* list){
     Tree* tree = malloc(sizeof(Tree));
@@ -215,6 +219,14 @@ CatchStmt* new_catch_stmt(void* expr, void* block){
     CatchStmt* stmt = malloc(sizeof(CatchStmt));
     stmt->eval = *new_eval(GET_FUN(catch_eval));
     stmt->expr = expr;
+    stmt->block = block;
+    return stmt;
+}
+
+ClassStmt* new_class_stmt(Token* name, struct list* parent, void* block){
+    ClassStmt* stmt = malloc(sizeof(ClassStmt*));
+    stmt->eval = *new_eval(GET_FUN(class_eval));
+    stmt->parent = parent;
     stmt->block = block;
     return stmt;
 }

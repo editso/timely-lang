@@ -18,6 +18,8 @@ typedef struct parser{
  */
 #define GET_TOKEN(parser) (parser->token)
 
+
+
 /**
  * 创建一个解析结构体
  * @param lexer 词法分析器指针
@@ -32,6 +34,12 @@ Parser* new_parser(Lexer* lexer);
  */
 Tree* parse(Parser* parser);
 
+/**
+ * 类解析
+ * @param parser 指针
+ * @return 解析完成后返回一个与之对于的指针
+ */
+void* parse_class(Parser* parser);
 /**
  * 标识符解析
  * @param parser 指针

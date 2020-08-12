@@ -126,6 +126,15 @@ typedef struct {
     void* stmt;
 }TryStmt;
 
+
+typedef struct {
+    Eval eval;
+    Token* name;
+    struct list* parent;
+    void* block;
+}ClassStmt;
+
+
 Tree* new_tree(struct list* list);
 
 VarTerm* new_var_term(Token* name, void* expr);
@@ -152,5 +161,6 @@ TryStmt* new_try_stmt(void* block, struct list *stmts, void* finally);
 
 CatchStmt* new_catch_stmt(void* expr, void* block);
 
+ClassStmt* new_class_stmt(Token* name, struct list* parent, void* block);
 
 #endif //TIMELY_LANG_TREE_H
