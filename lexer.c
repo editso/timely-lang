@@ -10,7 +10,7 @@
 #include "../include/basic.h"
 
 char c_buf_[1];
-int read_char(struct lexer* lexer){
+int read_chr(struct lexer* lexer){
     if (lexer->last_chr == EMPTY){
         bzero(c_buf_, sizeof(c_buf_));
         lexer->col_pos++;
@@ -44,23 +44,23 @@ int is_new_line(int chr){
     return chr == '\r' || chr ==  '\n';
 }
 
-void set_last_chr(Lexer* lexer, int pos){
+void unread_chr(Lexer* lexer, int pos){
     lexer->last_chr = pos;
 }
 
 char* read_letter(Lexer *lexer){
     int chr;
     struct list* buff = new_list();
-    while ((chr = read_char(lexer)) != END){
+    while ((chr = read_chr(lexer)) != END){
         // a_9 | a$9
         if (is_letter(chr) || is_symbol(chr) || is_digit(chr)){
             list_add(buff, GET_CHAR(chr));
         }else{
-            set_last_chr(lexer, chr);
+            unread_chr(lexer, chr);
             break;
         }
     }
-    char *s = to_string(buff);
+    char *s = list_to_string(buff);
     free(buff);
     return s;
 }
@@ -69,27 +69,27 @@ char* read_digit(Lexer *lexer){
     int chr;
     struct list *buff = new_list();
     t_bool dot = t_false;
-    while ((chr = read_char(lexer)) != END){
+    while ((chr = read_chr(lexer)) != END){
         if (is_digit(chr)){
             list_add(buff, GET_CHAR(chr));
         } else if (chr == '.' && !dot){
             dot = t_true;
             int pre_chr = chr;
-            chr = read_char(lexer);
+            chr = read_chr(lexer);
             if (is_digit(chr)){
                 list_add(buff, GET_CHAR(pre_chr));
                 list_add(buff, GET_CHAR(chr));
                 dot = t_true;
             }else{
-                set_last_chr(lexer, chr);
+                unread_chr(lexer, chr);
                 break;
             }
         }else{
-            set_last_chr(lexer, chr);
+            unread_chr(lexer, chr);
             break;
         }
     }
-    char *s = to_string(buff);
+    char *s = list_to_string(buff);
     free(buff);
     return s;
 }
@@ -98,7 +98,7 @@ char* read_string(Lexer *lexer){
     int chr;
     struct list *buff = new_list();
     int flag = 0;
-    while ((chr = read_char(lexer)) != END){
+    while ((chr = read_chr(lexer)) != END){
         if (chr == '\'' || chr == '"'){
             list_add(buff, GET_CHAR(chr));
             if (flag && !strcmp((char *)&chr, buff->head->data)){
@@ -111,11 +111,11 @@ char* read_string(Lexer *lexer){
     }
     if (chr == END){
         lexer_error("String is not closed normally",
-                    to_string(buff),
+                    list_to_string(buff),
                     lexer->row_pos,
                     lexer->col_pos);
     }
-    char *s = to_string(buff);
+    char *s = list_to_string(buff);
     free(buff);
     return s;
 }
@@ -147,7 +147,8 @@ Token* new_end_token(){
 
 void read_all(Lexer *lexer){
     int chr;
-    while ((chr = read_char(lexer)) != END){
+
+    while ((chr = read_chr(lexer)) != END){
         if (is_new_line(chr)){
             lexer->col_pos = 1;
             lexer->row_pos++;
@@ -174,7 +175,7 @@ void read_all(Lexer *lexer){
             case '.':
             case ':':
             case ';':{
-                int op = read_char(lexer);
+                int op = read_chr(lexer);
                 /**
                  * ++  -- ....
                  */
@@ -194,7 +195,7 @@ void read_all(Lexer *lexer){
                         break;
                     }
                     default:{
-                        set_last_chr(lexer, op);
+                        unread_chr(lexer, op);
                         char *c = malloc(sizeof(char));
                         *c = (char)chr;
                         list_add(lexer->tokens, new_token(lexer, chr, c));
@@ -209,15 +210,15 @@ void read_all(Lexer *lexer){
                  *  处理字符串
                  *
                  */
-                set_last_chr(lexer, chr);
+                unread_chr(lexer, chr);
                 list_add(lexer->tokens, new_token(lexer, STRING, read_string(lexer)));
                 break;
             default:{
                 if (is_digit(chr)){
-                    set_last_chr(lexer, chr);
+                    unread_chr(lexer, chr);
                     list_add(lexer->tokens, new_token(lexer,NUMBER, read_digit(lexer)));
                 } else if (is_letter(chr) || is_symbol(chr)){
-                    set_last_chr(lexer, chr);
+                    unread_chr(lexer, chr);
                     Kind kind;
                     char *c = read_letter(lexer);
                     if ((kind = find_kind(c).kind) == EMPTY){
@@ -254,11 +255,12 @@ t_bool fill_list(Lexer* lexer, int index){
 
 Lexer* new_lexer(char *file){
     struct lexer *lexer = malloc(sizeof(struct lexer));
-    lexer->tokens = malloc(sizeof(struct list));
     if ((lexer->file = fopen(file, "r")) == NULL){
         perror("timely");
         exit(0);
     }
+    lexer->source = file;
+    lexer->tokens = malloc(sizeof(struct list));
     lexer->last_chr = EMPTY;
     lexer->row_pos = 1;
     lexer->col_pos = 1;

@@ -10,12 +10,12 @@ unsigned long hash(void* key){
     return key? (unsigned long )key : 0;
 }
 
-unsigned int position(void* key, unsigned int m){
+unsigned int hash_fun(void* key, unsigned int m){
     return hash(key) % m;
 }
 
 struct list* map_get_(Map* map, void* key){
-    unsigned int pos = position(key, map->prime);
+    unsigned int pos = hash_fun(key, map->prime);
     return map->elem[pos];
 }
 
@@ -46,14 +46,14 @@ unsigned int get_prime(unsigned int number){
 Map* new_map(unsigned int size){
     Map* map = malloc(sizeof(Map));
     map->size = 0;
-    map->capacity = size ? size : 10;
+    map->capacity = size ? size : 11;
     map->elem = malloc(sizeof(struct list) * map->capacity);
     map->prime = get_prime(map->capacity);
     return map;
 }
 
 void map_put(Map* map, void* key, void* value){
-    unsigned int pos = position(key, map->prime);
+    unsigned int pos = hash_fun(key, map->prime);
     if (map->elem[pos] == NULL){
         map->elem[pos] = new_list();
     }

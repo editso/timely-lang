@@ -160,7 +160,7 @@ void* list_remove(struct list* list, unsigned int index){
  * @param list 需要被转换为string的集合
  * @return 转换后的
  */
-char* to_string(struct list* list){
+char* list_to_string(struct list* list){
     char* s= malloc(sizeof(char ) * list->size);
     for (int i = 0; i < list->size; ++i) {
         memmove(s+i, list_get(list, i), 1);

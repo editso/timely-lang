@@ -5,6 +5,7 @@
 #include "../include/log.h"
 #include "string.h"
 
+
 KindMeta get_kind_meta(Kind kind){
     if (kind != NEWLINE && kind >= 0 && kind <= 127){
         KindMeta* meta = malloc(sizeof(KindMeta));
@@ -22,6 +23,35 @@ KindMeta get_kind_meta(Kind kind){
     }
     return EMPTY_KIND;
 }
+
+
+void print_error(char* label, char* line, char* pos, char* fmt, va_list arg){
+    fprintf(stdout,"%s:%s:",line, pos);
+    fprintf(stdout, "%s:", label);
+    vprintf(fmt,arg);
+    fprintf(stdout,"\n");
+}
+
+
+void log_error(char* file, unsigned int line, unsigned int pos, char* fmt, ...){
+    va_list args;
+    va_start(args, fmt);
+    StringBuff* buff = new_sbuff(10);
+    append_str(buff,file);
+    append_str(buff,":");
+    append_str(buff, itochr((int)line));
+    print_error("ERROR", to_string(buff), itochr((int)pos), fmt, args);
+    va_end(args);
+    free(buff->body);
+    free(buff);
+    exit(1);
+}
+
+
+char* get_token_pos(Token* token){
+    return "(pos)";
+}
+
 
 void lexer_error(char *m, char *s, unsigned int row, unsigned int col){
     size_t len = strlen(s);
@@ -69,3 +99,33 @@ void out_token(Token* token){
           token->col_pos);
 }
 
+
+char *reverse(char* s){
+    unsigned long len = strlen(s);
+    char chr;
+    for (unsigned int i = len - 1, j = 0;  j < i; --i, j++) {
+        chr = s[j];
+        s[j] = s[i];
+        s[i] = chr;
+    }
+    return s;
+}
+
+char* itochr(int i){
+    int num = abs(i);
+    if (num == 0) return "0";
+    StringBuff* buff = new_sbuff(10);
+    int n;
+    while (num > 0){
+        n = num % 10;
+        append_chr(buff, (char)(n + '0'));
+        num /= 10;
+    }
+    if (i < 0){
+        append_chr(buff, '-');
+    }
+    char* value = to_string(buff);
+    free(buff->body);
+    free(buff);
+    return reverse(value);
+}

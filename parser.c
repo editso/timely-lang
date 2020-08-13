@@ -12,14 +12,9 @@ Token *peek(Parser *parser, int index) {
     return lexer_peek(parser->lexer, index);
 }
 
-void match(Parser *parser, Kind kind) {
+void expect(Parser *parser, Kind kind) {
     if (kind != GET_TOKEN(parser)->kind) {
-        fprintf(stderr, "需要: %s, 出现: %s: (%d,%d)",
-                get_kind_meta(kind).name,
-                get_kind_meta(GET_TOKEN(parser)->kind).name,
-                parser->token->row_pos,
-                parser->token->col_pos);
-        abort();
+       errort(parser->lexer->source, GET_TOKEN(parser),"");
     }
     move(parser);
 }
@@ -27,7 +22,7 @@ void match(Parser *parser, Kind kind) {
 /**
  * 匹配一行结尾
  */
-void match_end(Parser *parser) {
+void expect_end(Parser *parser) {
     Token *token = GET_TOKEN(parser);
     if (token->kind != NEWLINE && token->kind != SEMI && token->kind != END) {
         print("在第 %d 行结尾需要 ';' 或另起一行(%d,%d),当前: %s",
@@ -80,13 +75,13 @@ Tree *parse(Parser *parser) {
 }
 
 void *parse_block(Parser *parser) {
-    match(parser, OP_FL_BRA);
+    expect(parser, OP_FL_BRA);
     struct list *stmts = new_list();
     while (GET_TOKEN(parser)->kind != CL_FL_BRA) {
         list_add(stmts, parse_stmt(parser));
         move(parser);
     }
-    match(parser, CL_FL_BRA);
+    expect(parser, CL_FL_BRA);
     return new_block_stmt(stmts);
 }
 
@@ -119,7 +114,7 @@ void *parse_fun(Parser *parser) {
     struct list *args = new_list();
     if (peek(parser, 0)->kind != OP_FL_BRA) {
         move(parser);
-        match(parser, OP_BRA);
+        expect(parser, OP_BRA);
         while (GET_TOKEN(parser)->kind != CL_BRA) {
             if (GET_TOKEN(parser)->kind == COMM) {
                 move(parser);
@@ -127,7 +122,7 @@ void *parse_fun(Parser *parser) {
             }
             list_add(args, parse_expr(parser));
         }
-        match(parser, CL_BRA);
+        expect(parser, CL_BRA);
     } else {
         move(parser);
     }
@@ -142,7 +137,7 @@ void *parse_id(Parser *parser) {
             move(parser);
             move(parser);
             void *var = new_var_term(token, parse_expr(parser));
-            match_end(parser);
+            expect_end(parser);
             return var;
         }
         case NEWLINE:
@@ -155,7 +150,7 @@ void *parse_id(Parser *parser) {
 
 void *parse_catch(Parser *parser) {
     move(parser);
-    match(parser, ID);
+    expect(parser, ID);
     ConstantTerm *var = new_constant_term(GET_TOKEN(parser));
     void *block = parse_block(parser);
     return new_catch_stmt(var, block);
@@ -180,9 +175,9 @@ void *parse_try(Parser *parser) {
 void *parse_while(Parser *parser) {
     Token *token = GET_TOKEN(parser);
     move(parser);
-    match(parser, OP_BRA);
+    expect(parser, OP_BRA);
     void *expr = parse_expr(parser);
-    match(parser, CL_BRA);
+    expect(parser, CL_BRA);
     void *stmt = new_while_stmt(token, expr, parse_block(parser));
     return stmt;
 }
@@ -358,8 +353,8 @@ void *parse_end(Parser *parser) {
                         break;
                     }
                 } while (t_true);
-                match(parser, CL_BRA);
-                match_end(parser);
+                expect(parser, CL_BRA);
+                expect_end(parser);
                 return new_call_term(left, args);
             }
             case DOT:
@@ -383,24 +378,22 @@ void *parse_constant(Parser *parser) {
             move(parser);
             return new_constant_term(token);
         default:
-            printf("无法解析的表达式: %s, ", token->text);
-            out_token(token);
-            abort();
+            errort(parser->lexer->source, token, "无法解析的表达式");
     }
+    return NULL;
 }
-
 
 void *parse_class(Parser *parser) {
     move(parser);
     Token* name = GET_TOKEN(parser);
-    match(parser, ID);
+    expect(parser, ID);
     struct list *parent = new_list();
     if (GET_TOKEN(parser)->kind == COLON) {
-        match(parser, COLON);
+        expect(parser, COLON);
         Token* token;
         while (((token = GET_TOKEN(parser))->kind != OP_FL_BRA)){
             if (token->kind != COMM){
-                match(parser, ID);
+                expect(parser, ID);
                 list_add(parent, new_constant_term(token));
                 continue;
             }
