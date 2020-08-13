@@ -48,7 +48,6 @@ typedef struct{
     void* value;
 }VarTerm;
 
-
 typedef struct{
     Eval eval;
     Token *name;

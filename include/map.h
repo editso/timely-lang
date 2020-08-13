@@ -21,6 +21,10 @@ typedef struct map_{
      */
     unsigned int capacity;
     /**
+     * < capacity 的最大质数
+     */
+    unsigned int prime;
+    /**
      * 二级指针
      */
     void **elem;

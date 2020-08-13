@@ -184,9 +184,6 @@ CallTerm* new_call_term(void* expr, struct list* args){
     term->expr = expr;
     term->eval = *new_eval(GET_FUN(call_eval));
     term->args = args;
-
-
-
     return term;
 }
 
@@ -226,6 +223,7 @@ CatchStmt* new_catch_stmt(void* expr, void* block){
 ClassStmt* new_class_stmt(Token* name, struct list* parent, void* block){
     ClassStmt* stmt = malloc(sizeof(ClassStmt*));
     stmt->eval = *new_eval(GET_FUN(class_eval));
+    stmt->name = name;
     stmt->parent = parent;
     stmt->block = block;
     return stmt;

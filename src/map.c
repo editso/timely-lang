@@ -15,7 +15,7 @@ unsigned int position(void* key, unsigned int m){
 }
 
 struct list* map_get_(Map* map, void* key){
-    unsigned int pos = position(key, map->capacity);
+    unsigned int pos = position(key, map->prime);
     return map->elem[pos];
 }
 
@@ -26,16 +26,34 @@ Elem* new_elem(void* key, void* value){
     return elem;
 }
 
+/**
+ * 获取一个数中最大的质数
+ * @param number >= 2
+ * @return < 2 返回 2 否则返回最大的质数
+ */
+unsigned int get_prime(unsigned int number){
+    for (unsigned int i = number; i >= 2; --i) {
+        for (int j = 2; j < i; ++j) {
+            if (i % j == 0)
+                break;
+            if (j == i - 1)
+                return i;
+        }
+    }
+    return 2;
+}
+
 Map* new_map(unsigned int size){
     Map* map = malloc(sizeof(Map));
     map->size = 0;
-    map->capacity = size? size : 10;
+    map->capacity = size ? size : 10;
     map->elem = malloc(sizeof(struct list) * map->capacity);
+    map->prime = get_prime(map->capacity);
     return map;
 }
 
 void map_put(Map* map, void* key, void* value){
-    unsigned int pos = position(key, map->capacity);
+    unsigned int pos = position(key, map->prime);
     if (map->elem[pos] == NULL){
         map->elem[pos] = new_list();
     }

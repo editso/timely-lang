@@ -51,6 +51,7 @@ void *parse_stmt(Parser *parser) {
     switch ((token = GET_TOKEN(parser))->kind) {
         case COMM:
             move(parser);
+            return new_empty(token);
         case ID:
             return parse_id(parser);
         case FUN:
