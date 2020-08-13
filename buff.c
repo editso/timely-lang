@@ -1,7 +1,7 @@
 //
 // Created by zy on 8/13/20.
 //
-#include "../include/basic.h"
+#include "include/basic.h"
 
 
 void buff_zero(char* buff, unsigned int size){
