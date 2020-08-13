@@ -33,15 +33,15 @@ void *constant_eval(Environment *env, ConstantTerm *term) {
     print("常量: %s", __FUNCTION__);
     switch (term->name->kind) {
         case NUMBER:
-            return atol(term->name->text);
+            return "number";
         case STRING:
             return "hello world";
         case ID:
             return term->name->text;
         default:
-            print("类型解析失败!");
-            abort();
+            error("失败");
     }
+    return NULL;
 }
 
 void *block_eval(Environment *env, BlockStmt *stmt) {

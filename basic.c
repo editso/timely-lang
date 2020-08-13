@@ -49,9 +49,16 @@ void log_error(char* file, unsigned int line, unsigned int pos, char* fmt, ...){
 
 
 char* get_token_pos(Token* token){
-    return "(pos)";
+    StringBuff* buff = new_sbuff(4);
+    append_chr(buff, '(');
+    append_str(buff, itochr((int)token->row_pos));
+    append_str(buff, itochr((int)token->col_pos));
+    append_chr(buff, ')');
+    char* s = to_string(buff);
+    free(buff->body);
+    free(buff);
+    return s;
 }
-
 
 void lexer_error(char *m, char *s, unsigned int row, unsigned int col){
     size_t len = strlen(s);

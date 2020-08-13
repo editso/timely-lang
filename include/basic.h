@@ -25,7 +25,7 @@
 #define STR2(s) #s
 #define STR(s) STR2(s)
 
-#define error(...) log_error(__FILE__, __Line__, -1, __VA_ARGS__)
+#define error(...) log_error(__FILE__ ":" STR(__LINE__), 1, 1, __VA_ARGS__)
 #define errort(file, token, ...) log_error(file, token->row_pos, token->col_pos, __VA_ARGS__)
 #define MALLOC_SIZE(t, size) sizeof(t) size
 
@@ -67,6 +67,8 @@ StringBuff *new_sbuff(int size);
 int append_str(StringBuff *buff, char *c);
 
 int append_chr(StringBuff *buff, char c);
+
+char buff_get(StringBuff* buff, int index);
 
 char *to_string(StringBuff *buff);
 

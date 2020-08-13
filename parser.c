@@ -8,6 +8,7 @@ void move(Parser *parser) {
     parser->token = lexer_read(parser->lexer);
 }
 
+
 Token *peek(Parser *parser, int index) {
     return lexer_peek(parser->lexer, index);
 }
@@ -70,6 +71,7 @@ Tree *parse(Parser *parser) {
     move(parser);
     while (GET_TOKEN(parser)->kind != END) {
         list_add(parser->root->stmts, parse_stmt(parser));
+//        out_token(GET_TOKEN(parser));
         move(parser);
     }
     return parser->root;
@@ -112,7 +114,7 @@ void *parse_expr(Parser *parser) {
 void *parse_fun(Parser *parser) {
     Token *token = GET_TOKEN(parser);
     move(parser);
-    struct list *args = new_list();
+    List *args = new_list();
     if (peek(parser, 0)->kind != OP_FL_BRA) {
         move(parser);
         expect(parser, OP_BRA);

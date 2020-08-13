@@ -82,3 +82,9 @@ void print_buff(StringBuff* buff){
 void clear_buff(StringBuff* buff){
     buff_zero(buff->body, buff->buff_size);
 }
+
+char buff_get(StringBuff* buff, int index){
+    if (buff->len > index)
+        return buff->body[index];
+    return '\0';
+}

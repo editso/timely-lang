@@ -2,7 +2,6 @@
 #include <setjmp.h>
 #include <signal.h>
 #include <errno.h>
-#include "include/stack.h"
 
 jmp_buf buf;
 
