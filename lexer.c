@@ -5,9 +5,9 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "../include/lexer.h"
-#include "../include/list.h"
-#include "../include/basic.h"
+#include "include/lexer.h"
+#include "include/list.h"
+#include "include/basic.h"
 
 char c_buf_[1];
 int read_chr(struct lexer* lexer){
@@ -50,7 +50,7 @@ void unread_chr(Lexer* lexer, int pos){
 
 char* read_letter(Lexer *lexer){
     int chr;
-    struct list* buff = new_list();
+    List * buff = new_list();
     while ((chr = read_chr(lexer)) != END){
         // a_9 | a$9
         if (is_letter(chr) || is_symbol(chr) || is_digit(chr)){
@@ -67,7 +67,7 @@ char* read_letter(Lexer *lexer){
 
 char* read_digit(Lexer *lexer){
     int chr;
-    struct list *buff = new_list();
+    List *buff = new_list();
     t_bool dot = t_false;
     while ((chr = read_chr(lexer)) != END){
         if (is_digit(chr)){
@@ -96,7 +96,7 @@ char* read_digit(Lexer *lexer){
 
 char* read_string(Lexer *lexer){
     int chr;
-    struct list *buff = new_list();
+    List *buff = new_list();
     int flag = 0;
     while ((chr = read_chr(lexer)) != END){
         if (chr == '\'' || chr == '"'){
@@ -260,7 +260,7 @@ Lexer* new_lexer(char *file){
         exit(0);
     }
     lexer->source = file;
-    lexer->tokens = malloc(sizeof(struct list));
+    lexer->tokens = malloc(sizeof(List));
     lexer->last_chr = EMPTY;
     lexer->row_pos = 1;
     lexer->col_pos = 1;

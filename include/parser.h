@@ -6,11 +6,13 @@
 #define TIMELY_LANG_PARSER_H
 #include "tree.h"
 #include "lexer.h"
+#include "stack.h"
 
-typedef struct parser{
+typedef struct parser_{
     Lexer *lexer;
     Tree *root;
     Token* token;
+    Stack* stack;
 }Parser;
 
 /**

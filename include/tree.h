@@ -4,94 +4,95 @@
 
 #ifndef TIMELY_LANG_TREE_H
 #define TIMELY_LANG_TREE_H
+
 #include "token.h"
 #include "list.h"
 #include "envir.h"
 
-typedef struct{
-    void* (*eval)(Environment* env, void* node);
-}Eval;
+typedef struct {
+    void *(*eval)(Environment *env, void *node);
+} Eval;
 
 #define GET_EVAL(eval) ((Eval*)eval)
 
 #define GET_FUN(fun) ((void *(*)(Environment *, void *))fun)
 
 
-typedef struct{
+typedef struct {
     Eval eval;
-    struct list* stmts;
-}Tree;
+    List *stmts;
+} Tree;
 
 typedef struct {
     Eval eval;
-    void* left;
+    void *left;
     Token *op;
-    void* right;
-}BinaryExpr;
+    void *right;
+} BinaryExpr;
 
-
-typedef struct {
-    Eval eval;
-    Token *op;
-    void* expr;
-}StartTerm;
 
 typedef struct {
     Eval eval;
     Token *op;
-    void* expr;
-}EndTerm;
+    void *expr;
+} StartTerm;
 
-typedef struct{
+typedef struct {
+    Eval eval;
+    Token *op;
+    void *expr;
+} EndTerm;
+
+typedef struct {
     Eval eval;
     Token *name;
-    void* value;
-}VarTerm;
+    void *value;
+} VarTerm;
 
-typedef struct{
+typedef struct {
     Eval eval;
     Token *name;
-}ConstantTerm;
+} ConstantTerm;
 
 /**
  * 函数调用
  */
-typedef struct{
+typedef struct {
     Eval eval;
     void *expr;
-    struct list* args;
-}CallTerm;
+    List *args;
+} CallTerm;
 
-
-typedef struct{
-    Eval eval;
-    struct list* stmts;
-}BlockStmt;
 
 typedef struct {
     Eval eval;
-    Token* token;
-}EmptyStmt;
+    List *stmts;
+} BlockStmt;
 
-typedef struct{
+typedef struct {
+    Eval eval;
+    Token *token;
+} EmptyStmt;
+
+typedef struct {
     Eval eval;
     Token *name;
-    void* expr;
-    void* block;
-}WhileStmt;
+    void *expr;
+    void *block;
+} WhileStmt;
 
 typedef struct {
     Eval eval;
-    Token* name;
-    struct list* args;
-    void* block;
-}FunStmt;
+    Token *name;
+    List *args;
+    void *block;
+} FunStmt;
 
-typedef struct{
+typedef struct {
     Eval eval;
-    void* expr;
-    void* block;
-}CatchStmt;
+    void *expr;
+    void *block;
+} CatchStmt;
 
 
 typedef struct {
@@ -102,7 +103,7 @@ typedef struct {
      *
      * }
      */
-    void* block;
+    void *block;
     /**
      * try{
      *
@@ -112,7 +113,7 @@ typedef struct {
      *
      * }
      */
-    struct list* stmts;
+    List *stmts;
     /**
      * try{
      *
@@ -122,44 +123,44 @@ typedef struct {
      *
      * }
      */
-    void* stmt;
-}TryStmt;
+    void *stmt;
+} TryStmt;
 
 
 typedef struct {
     Eval eval;
-    Token* name;
-    struct list* parent;
-    void* block;
-}ClassStmt;
+    Token *name;
+    List *parent;
+    void *block;
+} ClassStmt;
 
 
-Tree* new_tree(struct list* list);
+Tree *new_tree(List *list);
 
-VarTerm* new_var_term(Token* name, void* expr);
+VarTerm *new_var_term(Token *name, void *expr);
 
-ConstantTerm* new_constant_term(Token* name);
+ConstantTerm *new_constant_term(Token *name);
 
-BinaryExpr* new_binary_expr(void* left,Token* op, void* right);
+BinaryExpr *new_binary_expr(void *left, Token *op, void *right);
 
-BlockStmt* new_block_stmt(struct list* stmts);
+BlockStmt *new_block_stmt(List *stmts);
 
-WhileStmt* new_while_stmt(Token* name, void* expr, void* block);
+WhileStmt *new_while_stmt(Token *name, void *expr, void *block);
 
-StartTerm* new_start_term(Token* op, void* expr);
+StartTerm *new_start_term(Token *op, void *expr);
 
-EndTerm* new_end_term(Token* op, void* expr);
+EndTerm *new_end_term(Token *op, void *expr);
 
-EmptyStmt* new_empty(Token *op);
+EmptyStmt *new_empty(Token *op);
 
-FunStmt* new_fun_stmt(Token* name, struct list* args, void* block);
+FunStmt *new_fun_stmt(Token *name, List *args, void *block);
 
-CallTerm* new_call_term(void* expr, struct list* args);
+CallTerm *new_call_term(void *expr, List *args);
 
-TryStmt* new_try_stmt(void* block, struct list *stmts, void* finally);
+TryStmt *new_try_stmt(void *block, List *stmts, void *finally);
 
-CatchStmt* new_catch_stmt(void* expr, void* block);
+CatchStmt *new_catch_stmt(void *expr, void *block);
 
-ClassStmt* new_class_stmt(Token* name, struct list* parent, void* block);
+ClassStmt *new_class_stmt(Token *name, List *parent, void *block);
 
 #endif //TIMELY_LANG_TREE_H

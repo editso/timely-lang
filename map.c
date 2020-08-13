@@ -1,8 +1,8 @@
 //
 // Created by zy on 8/11/20.
 //
-#include "../include/map.h"
-#include "../include/list.h"
+#include "include/map.h"
+#include "include/list.h"
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -14,7 +14,7 @@ unsigned int hash_fun(void* key, unsigned int m){
     return hash(key) % m;
 }
 
-struct list* map_get_(Map* map, void* key){
+List * map_get_(Map* map, void* key){
     unsigned int pos = hash_fun(key, map->prime);
     return map->elem[pos];
 }
@@ -47,7 +47,7 @@ Map* new_map(unsigned int size){
     Map* map = malloc(sizeof(Map));
     map->size = 0;
     map->capacity = size ? size : 11;
-    map->elem = malloc(sizeof(struct list) * map->capacity);
+    map->elem = malloc(sizeof(List) * map->capacity);
     map->prime = get_prime(map->capacity);
     return map;
 }
@@ -57,7 +57,7 @@ void map_put(Map* map, void* key, void* value){
     if (map->elem[pos] == NULL){
         map->elem[pos] = new_list();
     }
-    struct list* els = map_get_(map, key);
+    List * els = map_get_(map, key);
     Elem* elem;
     Node* node = els->head;
     while (node != NULL){
@@ -73,7 +73,7 @@ void map_put(Map* map, void* key, void* value){
 }
 
 void* map_get(Map* map, void* key){
-    struct list* els = map_get_(map, key);
+    List * els = map_get_(map, key);
     if (els == NULL)return NULL;
     Elem* elem;
     Node* node = els->head;
@@ -88,7 +88,7 @@ void* map_get(Map* map, void* key){
 }
 
 void* map_remove(Map* map, void* key){
-    struct list *els = map_get_(map,key);
+    List *els = map_get_(map,key);
     if (els == NULL)return NULL;
     Elem* elem;
     for (int i = 0; i < els->size; ++i) {

@@ -11,13 +11,18 @@
 
 
 typedef struct lexer{
+    /**
+     * 源文件
+     */
+    char* source;
     FILE *file;
     unsigned int col_pos;
     unsigned int row_pos;
     int last_chr; // 最后一次的位置
     t_bool also; // 是否已经读完了
-    struct list* tokens;
+    List* tokens;
 }Lexer;
+
 
 Lexer* new_lexer(char *);
 

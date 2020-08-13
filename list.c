@@ -3,7 +3,7 @@
 //
 #ifndef TIMELY_LANG_LIST_C_H
 #define TIMELY_LANG_LIST_C_H
-#include "../include/list.h"
+#include "include/list.h"
 #include <string.h>
 
 Node* new_node(void* data){
@@ -16,8 +16,8 @@ Node* new_node(void* data){
  * 创建一个新的list
  * @return 新的 list
  */
-struct list* new_list(){
-    struct list* list = malloc(sizeof(struct list));
+List * new_list(){
+    List * list = malloc(sizeof(List));
     list->size = 0;
     list->head = NULL;
     list->tail = NULL;
@@ -29,7 +29,7 @@ struct list* new_list(){
  * @param list 指向list的指针
  * @param data 数据
  */
-void list_add(struct list* list, void *data){
+void list_add(List * list, void *data){
     list_insert(list, list->size, data);
 }
 
@@ -39,7 +39,7 @@ void list_add(struct list* list, void *data){
  * @param 插入的位置
  * @param data数据 插入成功 1, 失败-1;
  */
-int list_insert(struct list* list, unsigned int index, void *data){
+int list_insert(List * list, unsigned int index, void *data){
     Node* new = new_node(data);
     // 第一个位置插入
     if (index == 0 || index == 1){
@@ -95,7 +95,7 @@ int list_insert(struct list* list, unsigned int index, void *data){
 }
 
 
-Node* list_get_(struct list* list, unsigned int index){
+Node* list_get_(List * list, unsigned int index){
     if (index >= list->size || index < 0){
         return NULL;
     }
@@ -117,7 +117,7 @@ Node* list_get_(struct list* list, unsigned int index){
  * @param i 位置
  * @return 如果有返回元素的数据,否则NULL
  */
-void* list_get(struct list* list, unsigned int index){
+void* list_get(List * list, unsigned int index){
     Node* node = list_get_(list, index);
     if (node == NULL)return NULL;
     return node->data;
@@ -129,7 +129,7 @@ void* list_get(struct list* list, unsigned int index){
  * @param i 位置
  * @return 如果删除成功返回被删除的数据,否则NULL
  */
-void* list_remove(struct list* list, unsigned int index){
+void* list_remove(List * list, unsigned int index){
     if (index >= list->size){
         return NULL;
     }
@@ -160,7 +160,7 @@ void* list_remove(struct list* list, unsigned int index){
  * @param list 需要被转换为string的集合
  * @return 转换后的
  */
-char* list_to_string(struct list* list){
+char* list_to_string(List * list){
     char* s= malloc(sizeof(char ) * list->size);
     for (int i = 0; i < list->size; ++i) {
         memmove(s+i, list_get(list, i), 1);

@@ -1,7 +1,7 @@
 //
 // Created by zy on 8/7/20.
 //
-#include "../include/parser.h"
+#include "include/parser.h"
 
 
 void move(Parser *parser) {
@@ -34,10 +34,11 @@ void expect_end(Parser *parser) {
     }
 }
 
-struct parser *new_parser(Lexer *lexer) {
-    struct parser *parser = malloc(sizeof(struct parser));
+Parser *new_parser(Lexer *lexer) {
+    Parser *parser = malloc(sizeof(Parser));
     parser->lexer = lexer;
     parser->root = new_tree(new_list());
+
     return parser;
 }
 
@@ -76,7 +77,7 @@ Tree *parse(Parser *parser) {
 
 void *parse_block(Parser *parser) {
     expect(parser, OP_FL_BRA);
-    struct list *stmts = new_list();
+    List *stmts = new_list();
     while (GET_TOKEN(parser)->kind != CL_FL_BRA) {
         list_add(stmts, parse_stmt(parser));
         move(parser);
@@ -159,7 +160,7 @@ void *parse_catch(Parser *parser) {
 void *parse_try(Parser *parser) {
     move(parser);
     void *block = parse_block(parser);
-    struct list *stmts = new_list();
+    List *stmts = new_list();
     while (GET_TOKEN(parser)->kind == CATCH) {
         list_add(stmts, parse_catch(parser));
     }
@@ -339,7 +340,7 @@ void *parse_end(Parser *parser) {
             }
             case OP_BRA: {
                 token = GET_TOKEN(parser);
-                struct list *args = new_list();
+                List *args = new_list();
                 do {
                     move(parser);
                     if (GET_TOKEN(parser)->kind == COMM) {
@@ -387,7 +388,7 @@ void *parse_class(Parser *parser) {
     move(parser);
     Token* name = GET_TOKEN(parser);
     expect(parser, ID);
-    struct list *parent = new_list();
+    List *parent = new_list();
     if (GET_TOKEN(parser)->kind == COLON) {
         expect(parser, COLON);
         Token* token;

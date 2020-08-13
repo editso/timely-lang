@@ -1,8 +1,8 @@
 //
 // Created by zy on 8/8/20.
 //
-#include "../include/basic.h"
-#include "../include/log.h"
+#include "include/basic.h"
+#include "include/log.h"
 #include "string.h"
 
 

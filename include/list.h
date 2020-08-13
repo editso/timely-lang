@@ -5,26 +5,27 @@
 
 #ifndef TIMELY_LANG_LIST_H
 #define TIMELY_LANG_LIST_H
+
 #include <stdlib.h>
 
-typedef struct node{
+typedef struct node {
     void *data;
-    struct node* prev;
-    struct node* next;
-}Node;
+    struct node *prev;
+    struct node *next;
+} Node;
 
 
-struct list{
-    Node* head;
-    Node* tail;
+typedef struct list_ {
+    Node *head;
+    Node *tail;
     unsigned int size;
-};
+} List;
 
 /**
  * 创建一个新的list
  * @return 新的 list
  */
-struct list* new_list();
+List *new_list();
 
 /**
  * 向list指定位置插入一个元素
@@ -32,7 +33,7 @@ struct list* new_list();
  * @param 插入的位置
  * @param data数据 插入成功 1, 失败-1;
  */
-int list_insert(struct list*, unsigned int, void *);
+int list_insert(List *, unsigned int, void *);
 
 
 /**
@@ -40,7 +41,7 @@ int list_insert(struct list*, unsigned int, void *);
  * @param list 指向list的指针
  * @param data 数据
  */
-void list_add(struct list*, void *);
+void list_add(List *, void *);
 
 /**
  * 获取指定位置的元素
@@ -48,8 +49,7 @@ void list_add(struct list*, void *);
  * @param i 位置
  * @return 如果有返回元素的数据,否则NULL
  */
-void* list_get(struct list*, unsigned int);
-
+void *list_get(List *, unsigned int);
 
 
 /**
@@ -58,12 +58,12 @@ void* list_get(struct list*, unsigned int);
  * @param i 位置
  * @return 如果删除成功返回被删除的数据,否则NULL
  */
-void* list_remove(struct list*, unsigned int);
+void *list_remove(List *, unsigned int);
 
 /**
  * tostring
  * @return string
  */
-char* to_string(struct list*);
+char *list_to_string(List *);
 
 #endif //TIMELY_LANG_LIST_H
