@@ -12,12 +12,14 @@
 char c_buf_[1];
 
 int read_chr(struct lexer *lexer) {
+    if (lexer->file == NULL) return END;
     if (lexer->last_chr == EMPTY) {
         bzero(c_buf_, sizeof(c_buf_));
         lexer->col_pos++;
         if (fread(c_buf_, sizeof(c_buf_), 1, lexer->file) <= 0) {
             fclose(lexer->file); // 关流
             lexer->also = t_false;
+            lexer->file = NULL;
             return END;
         }
         return *c_buf_;
@@ -51,11 +53,11 @@ void unread_chr(Lexer *lexer, int pos) {
 
 char *read_letter(Lexer *lexer) {
     int chr;
-    StringBuff* buff = new_sbuff(10);
+    StringBuff *buff = new_sbuff(10);
     while ((chr = read_chr(lexer)) != END) {
         // a_9 | a$9
         if (is_letter(chr) || is_symbol(chr) || is_digit(chr)) {
-              append_chr(buff, (char)chr);
+            append_chr(buff, (char) chr);
         } else {
             unread_chr(lexer, chr);
             break;
@@ -79,8 +81,8 @@ char *read_digit(Lexer *lexer) {
             int pre_chr = chr;
             chr = read_chr(lexer);
             if (is_digit(chr)) {
-                append_chr(buff, (char)pre_chr);
-                append_chr(buff, (char)chr);
+                append_chr(buff, (char) pre_chr);
+                append_chr(buff, (char) chr);
                 dot = t_true;
             } else {
                 unread_chr(lexer, chr);
@@ -99,18 +101,18 @@ char *read_digit(Lexer *lexer) {
 
 char *read_string(Lexer *lexer) {
     int chr;
-    StringBuff* buff = new_sbuff(10);
+    StringBuff *buff = new_sbuff(10);
     int flag = 0;
     while ((chr = read_chr(lexer)) != END) {
         if (chr == '\'' || chr == '"') {
-            append_chr(buff, (char )chr);
+            append_chr(buff, (char) chr);
             if (flag && chr == buff_get(buff, 0)) {
                 break;
             }
             flag = 1;
         } else {
 
-            append_chr(buff, (char )chr);
+            append_chr(buff, (char) chr);
         }
     }
     if (chr == END) {
@@ -143,21 +145,76 @@ Token *new_token(struct lexer *lexer, int kind, char *text) {
     return token;
 }
 
-
 Token *new_end_token() {
     Token *token = malloc(sizeof(Token));
     token->kind = END;
     return token;
 }
 
+/**
+ * 多行注释
+ */
+char *read_multi_note(Lexer *lexer) {
+    int chr;
+    int op;
+    StringBuff *buff = new_sbuff(20);
+    while ((chr = read_chr(lexer))) {
+        if (chr == '*') {
+            op = read_chr(lexer);
+            // 可能下一个还是 * 那么记录下一个星
+            if (op == '*') {
+                append_chr(buff, (char) chr);
+                unread_chr(lexer, op);
+                continue;
+            } else if (op == '/') {
+                break;
+            }
+        }
+        if (is_new_line(chr)) {
+            lexer->row_pos++;
+        }
+        if (chr == END) {
+            lexer_error("note is not closed normally",
+                        to_string(buff),
+                        lexer->row_pos,
+                        lexer->col_pos);
+        }
+        append_chr(buff, (char) chr);
+    }
+    char *s = to_string(buff);
+    free(buff->body);
+    free(buff);
+    return s;
+}
+
+/**
+ * 单行
+ */
+char *read_single_note(Lexer *lexer) {
+    int chr;
+    StringBuff *buff = new_sbuff(20);
+    while ((chr = read_chr(lexer))) {
+        if (is_new_line(chr) || chr == END) {
+            lexer->row_pos++;
+            break;
+        }
+        append_chr(buff, (char) chr);
+    }
+    char *s = to_string(buff);
+    free(buff->body);
+    free(buff);
+    return s;
+}
+
 void read_all(Lexer *lexer) {
     int chr;
-
+    StringBuff *buff = new_sbuff(2);
     while ((chr = read_chr(lexer)) != END) {
         if (is_new_line(chr)) {
             lexer->col_pos = 1;
             lexer->row_pos++;
         }
+        clear_buff(buff);
         switch (chr) {
             case '+':
             case '-':
@@ -192,18 +249,28 @@ void read_all(Lexer *lexer) {
                     case '|':
                     case '>':
                     case '=': {
-                        char *array = malloc(sizeof(char) + 1);
-                        array[0] = (char) chr;
-                        array[1] = (char) op;
-                        KindMeta kind = find_kind(array);
-                        list_add(lexer->tokens, new_token(lexer, kind.kind, array));
+                        append_chr(buff, (char) chr);
+                        append_chr(buff, (char) op);
+                        char *s = to_string(buff);
+                        KindMeta kind = find_kind(s);
+                        list_add(lexer->tokens, new_token(lexer, kind.kind, s));
+                        break;
+                    }
+                    case '/':
+                    case '*': {
+                        if (op == '/') {
+                            // single
+                            read_single_note(lexer);
+                        } else {
+                            // multi
+                            read_multi_note(lexer);
+                        }
                         break;
                     }
                     default: {
                         unread_chr(lexer, op);
-                        char *c = malloc(sizeof(char));
-                        *c = (char) chr;
-                        list_add(lexer->tokens, new_token(lexer, chr, c));
+                        append_chr(buff, '/');
+                        list_add(lexer->tokens, new_token(lexer, chr, to_string(buff)));
                         break;
                     }
                 }
@@ -231,13 +298,15 @@ void read_all(Lexer *lexer) {
                     }
                     list_add(lexer->tokens, new_token(lexer, kind, c));
                 } else if (is_new_line(chr)) {
-                    char *s = malloc(sizeof(char));
-                    *s = (char) chr;
-                    list_add(lexer->tokens, new_token(lexer, NEWLINE, s));
+                    append_chr(buff, (char) chr);
+                    list_add(lexer->tokens, new_token(lexer, NEWLINE, to_string(buff)));
                 }
             }
         }
+
     }
+    free(buff->body);
+    free(buff);
 }
 
 

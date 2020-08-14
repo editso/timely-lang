@@ -73,7 +73,7 @@ void lexer_error(char *m, char *s, unsigned int row, unsigned int col){
     }
     fprintf(stderr,"%s:(%d, %d)\n", m,row,col);
     fprintf(stderr,"%s%s%s\n",n_buff,s,buff);
-    abort();
+    exit(1);
 }
 
 

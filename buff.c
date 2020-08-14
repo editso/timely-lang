@@ -81,6 +81,7 @@ void print_buff(StringBuff* buff){
 
 void clear_buff(StringBuff* buff){
     buff_zero(buff->body, buff->buff_size);
+    buff->len = 0;
 }
 
 char buff_get(StringBuff* buff, int index){

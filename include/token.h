@@ -30,6 +30,32 @@ typedef enum {
     ARROW_FUN  = 230, // =>
     SUPER      = 231, // super
 
+
+
+    PUBLIC     = 232, // public
+    PRIVATE    = 233, // private
+    PROTECTED  = 234, // protected
+    INTERFACE  = 235, // interface
+    STATIC     = 236, // static
+
+
+    // Basic Type
+    ANY         = 237, // any 任意类型
+    INT         = 238, // int
+    FLOAT       = 239, // float
+    CHAR        = 240, // char
+    VOID        = 241, // void
+
+    THIS       = 242, // this
+    ENUM       = 243, // enum
+    FINAL      = 245, // final
+    SWITCH     = 246, // switch
+    CASE       = 247, // case
+    DEFAULT    = 248, // default
+
+    NOTE_MULTI  = 251, // 多行注释
+    NOTE_SINGLE = 252, // 单行注释
+
     MOD         = 37, // %
     AND        = 38, // &
     OR         = 124,// |
@@ -92,40 +118,55 @@ typedef struct{
 
 
 static const KindMeta kind_table[] = {
-        {ADD2,   "++"},
-        {SUB2,   "--"},
-        {EQ2,    "=="},
-        {ADD_EQ, "+="},
-        {AND_EQ, "&="},
-        {OR_EQ,  "|="},
-        {MUL_EQ, "*="},
-        {DIV_EQ, "/="},
-        {SUB_EQ, "-="},
-        {MOD_EQ, "%="},
-        {XOR_EQ, "^="},
-        {LE_EQ,  "<="},
-        {BIG_EQ, ">="},
-        {EM_EQ,  "!="},
-        {OR2,    "||"},
-        {AND2,   "&&"},
-        {IF,     "if"},
-        {ELSE,   "else"},
-        {WHILE,  "while"},
-        {DO,     "do"},
-        {FUN,    "fun"},
-        {IMPORT, "import"},
-        {DOT2, ".."},
-        {RETURN, "return"},
-        {CONTINUE, "continue"},
-        {BREAK,  "break"},
-        {TRY, "try"},
-        {CATCH, "catch"},
-        {FINALLY, "finally"},
-        {CLASS, "class"},
+        {ADD2,      "++"},
+        {SUB2,      "--"},
+        {EQ2,       "=="},
+        {ADD_EQ,    "+="},
+        {AND_EQ,    "&="},
+        {OR_EQ,     "|="},
+        {MUL_EQ,    "*="},
+        {DIV_EQ,    "/="},
+        {SUB_EQ,    "-="},
+        {MOD_EQ,    "%="},
+        {XOR_EQ,    "^="},
+        {LE_EQ,     "<="},
+        {BIG_EQ,    ">="},
+        {EM_EQ,     "!="},
+        {OR2,       "||"},
+        {AND2,      "&&"},
+        {IF,        "if"},
+        {ELSE,      "else"},
+        {WHILE,     "while"},
+        {DO,        "do"},
+        {FUN,       "fun"},
+        {IMPORT,    "import"},
+        {DOT2,      ".."},
+        {RETURN,    "return"},
+        {CONTINUE,  "continue"},
+        {BREAK,     "break"},
+        {TRY,       "try"},
+        {CATCH,     "catch"},
+        {FINALLY,   "finally"},
+        {CLASS,     "class"},
         {ARROW_FUN, "=>"},
-        {SUPER, "super"},
-        {ID,"<标识符>"},
-        {NEWLINE, "<New Line>"}
+        {SUPER,     "super"},
+        {ID,        "<标识符>"},
+        {NEWLINE,   "<New Line>"},
+        {PUBLIC,    "public"},
+        {PRIVATE,   "private"},
+        {PROTECTED, "protected"},
+        {INTERFACE, "interface"},
+        {STATIC,    "static"},
+        {ANY,       "any"},
+        {INT,       "int"},
+        {FLOAT,     "float"},
+        {CHAR,      "char"},
+        {VOID,      "void"},
+        {THIS,      "this"},
+        {ENUM,      "enum"},
+        {DEFAULT,   "default"},
+        {SWITCH,    "switch"},
+        {CASE, "case"}
 };
 
 /**

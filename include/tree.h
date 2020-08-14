@@ -107,9 +107,9 @@ typedef struct {
     /**
      * try{
      *
-     * }catch(){
+     * }catch e{
      *
-     * }catch(){
+     * }catch e{
      *
      * }
      */
@@ -117,7 +117,7 @@ typedef struct {
     /**
      * try{
      *
-     * }catch{
+     * }catch e{
      *
      * }finally{
      *
@@ -152,6 +152,7 @@ StartTerm *new_start_term(Token *op, void *expr);
 EndTerm *new_end_term(Token *op, void *expr);
 
 EmptyStmt *new_empty(Token *op);
+
 
 FunStmt *new_fun_stmt(Token *name, List *args, void *block);
 

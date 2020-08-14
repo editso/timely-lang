@@ -39,7 +39,7 @@ Parser *new_parser(Lexer *lexer) {
     Parser *parser = malloc(sizeof(Parser));
     parser->lexer = lexer;
     parser->root = new_tree(new_list());
-
+    parser->stack =new_stack();
     return parser;
 }
 
@@ -70,8 +70,8 @@ void *parse_stmt(Parser *parser) {
 Tree *parse(Parser *parser) {
     move(parser);
     while (GET_TOKEN(parser)->kind != END) {
-        list_add(parser->root->stmts, parse_stmt(parser));
-//        out_token(GET_TOKEN(parser));
+//        list_add(parser->root->stmts, parse_stmt(parser));
+        out_token(GET_TOKEN(parser));
         move(parser);
     }
     return parser->root;

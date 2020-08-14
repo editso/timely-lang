@@ -21,7 +21,6 @@ typedef struct parser_{
 #define GET_TOKEN(parser) (parser->token)
 
 
-
 /**
  * 创建一个解析结构体
  * @param lexer 词法分析器指针
