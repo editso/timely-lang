@@ -288,7 +288,7 @@ Token* select_token(Lexer* lexer, int chr, StringBuff* buff){
 
 void read_all(Lexer *lexer) {
     int chr;
-    StringBuff *buff = new_sbuff(2);
+    StringBuff *buff = new_sbuff(10);
     Token* token;
     while ((chr = read_chr(lexer)) != END) {
         if (is_new_line(chr)) {
