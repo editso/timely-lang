@@ -34,7 +34,7 @@ void *constant_eval(Environment *env, ConstantTerm *term) {
     switch (term->name->kind) {
         case NUMBER:
             return "number";
-        case STRING:
+        case CONST_STRING:
             return "hello world";
         case ID:
             return term->name->text;

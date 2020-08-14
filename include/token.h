@@ -7,104 +7,105 @@
 
 
 typedef enum {
-    ID         = 200, // 标识符
-    END        = 201, // 项目结束符
-    IF         = 202, // if
-    ELSE       = 203, // else
-    WHILE      = 204, // while
-    DO         = 205, // do
-    FUN        = 206, // fun
-    CLASS      = 207, // class
-    NUMBER     = 208, // number
-    EMPTY      = 209, // 什么都没有
-    STRING     = 210, // string
-    NEWLINE    = 211, // newline \r\n
-    IMPORT     = 212, // import
-    DOT2       = 213, // ..
-    RETURN     = 214, // return
-    BREAK      = 215, // break
-    CONTINUE   = 216, // continue
-    TRY        = 227, // try
-    CATCH      = 228, // catch
-    FINALLY    = 229, // finally
-    ARROW_FUN  = 230, // =>
-    SUPER      = 231, // super
+    ID                  = 200, // 标识符
+    END                 = 201, // 项目结束符
+    IF                  = 202, // if
+    ELSE                = 203, // else
+    WHILE               = 204, // while
+    DO                  = 205, // do
+    FUN                 = 206, // fun
+    CLASS               = 207, // class
+    NUMBER              = 208, // number
+    EMPTY               = 209, // 什么都没有
+    CONST_STRING        = 210, // string
+    NEWLINE             = 211, // newline \r\n
+    IMPORT              = 212, // import
+    DOT2                = 213, // ..
+    RETURN              = 214, // return
+    BREAK               = 215, // break
+    CONTINUE            = 216, // continue
+    TRY                 = 227, // try
+    CATCH               = 228, // catch
+    FINALLY             = 229, // finally
+    ARROW_FUN           = 230, // =>
+    SUPER               = 231, // super
 
 
 
-    PUBLIC     = 232, // public
-    PRIVATE    = 233, // private
-    PROTECTED  = 234, // protected
-    INTERFACE  = 235, // interface
-    STATIC     = 236, // static
+    PUBLIC              = 232, // public
+    PRIVATE             = 233, // private
+    PROTECTED           = 234, // protected
+    INTERFACE           = 235, // interface
+    STATIC              = 236, // static
+
 
 
     // Basic Type
-    ANY         = 237, // any 任意类型
-    INT         = 238, // int
-    FLOAT       = 239, // float
-    CHAR        = 240, // char
-    VOID        = 241, // void
+    ANY                 = 237, // any 任意类型
+    INT                 = 238, // int
+    FLOAT               = 239, // float
+    CHAR                = 240, // char
+    VOID                = 241, // void
 
-    THIS       = 242, // this
-    ENUM       = 243, // enum
-    FINAL      = 245, // final
-    SWITCH     = 246, // switch
-    CASE       = 247, // case
-    DEFAULT    = 248, // default
-
-    NOTE_MULTI  = 251, // 多行注释
-    NOTE_SINGLE = 252, // 单行注释
-
-    MOD         = 37, // %
-    AND        = 38, // &
-    OR         = 124,// |
-    EM         = 33, // !
-    XOR        = 94, // ^
-
-    MOD_EQ      = 180,// %=
-    AND_EQ     = 181,// &=
-    OR_EQ      = 182,// |=
-    XOR_EQ     = 183,// ^=
-    OR2        = 184,// ||
-    AND2       = 185,// &&
-
-    MUL        = 42, // *
-    ADD        = 43, // +
-    SUB        = 45, // -
-    DIV        = 47, // /
-
-    MUL_EQ     = 170, // *=
-    ADD_EQ     = 171, // +=
-    SUB_EQ     = 172, // -=
-    DIV_EQ     = 173, // /=
-    ADD2       = 174, // ++
-    SUB2       = 175, // --
-
-    LE         = 60, // <
-    EQ         = 61, // =
-    BIG        = 62, // >
-
-    LE_EQ      = 160, // <=
-    BIG_EQ     = 161, // >=
-    EQ2        = 163, // ==
-    EM_EQ      = 164, // !=
-    LE2        = 165, // <<
-    BIG2       = 166, // >>
-
-    COLON      = 58, // :
-    SEMI       = 59, // ;
-    DOT        = 46, // .
-    DQ         = 34, // "
-    COMM       = 44, // ,
+    THIS                = 242, // this
+    ENUM                = 243, // enum
+    FINAL               = 245, // final
+    SWITCH              = 246, // switch
+    CASE                = 247, // case
+    DEFAULT             = 248, // default
 
 
-    OP_SQ_BRA  = 91, // [
-    CL_SQ_BRA  = 93, // ]
-    OP_BRA     = 40, // (
-    CL_BRA     = 41, // )
-    OP_FL_BRA  = 123, // {
-    CL_FL_BRA  = 125, // }
+    CONST_CHAR          = 249,  // char 'c'
+
+    MOD                 = 37,   // %
+    AND                 = 38,   // &
+    OR                  = 124,  // |
+    EM                  = 33,   // !
+    XOR                 = 94,   // ^
+
+    MOD_EQ              = 180,  // %=
+    AND_EQ              = 181,  // &=
+    OR_EQ               = 182,  // |=
+    XOR_EQ              = 183,  // ^=
+    OR2                 = 184,  // ||
+    AND2                = 185,  // &&
+
+    MUL                 = 42,   // *
+    ADD                 = 43,   // +
+    SUB                 = 45,   // -
+    DIV                 = 47,   // /
+
+    MUL_EQ              = 170,  // *=
+    ADD_EQ              = 171,  // +=
+    SUB_EQ              = 172,  // -=
+    DIV_EQ              = 173,  // /=
+    ADD2                = 174,  // ++
+    SUB2                = 175,  // --
+
+    LE                  = 60,   // <
+    EQ                  = 61,   // =
+    BIG                 = 62,   // >
+
+    LE_EQ               = 160,  // <=
+    BIG_EQ              = 161,  // >=
+    EQ2                 = 163,  // ==
+    EM_EQ               = 164,  // !=
+    LE2                 = 165,  // <<
+    BIG2                = 166,  // >>
+
+    COLON               = 58,   // :
+    SEMI                = 59,   // ;
+    DOT                 = 46,   // .
+    DQ                  = 34,   // "
+    COMM                = 44,   // ,
+
+
+    OP_SQ_BRA           = 91,   // [
+    CL_SQ_BRA           = 93,   // ]
+    OP_BRA              = 40,   // (
+    CL_BRA              = 41,   // )
+    OP_FL_BRA           = 123,  // {
+    CL_FL_BRA           = 125,  // }
 }Kind;
 
 

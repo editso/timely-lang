@@ -51,82 +51,6 @@ void unread_chr(Lexer *lexer, int pos) {
     lexer->last_chr = pos;
 }
 
-char *read_letter(Lexer *lexer) {
-    int chr;
-    StringBuff *buff = new_sbuff(10);
-    while ((chr = read_chr(lexer)) != END) {
-        // a_9 | a$9
-        if (is_letter(chr) || is_symbol(chr) || is_digit(chr)) {
-            append_chr(buff, (char) chr);
-        } else {
-            unread_chr(lexer, chr);
-            break;
-        }
-    }
-    char *s = to_string(buff);
-    free(buff->body);
-    free(buff);
-    return s;
-}
-
-char *read_digit(Lexer *lexer) {
-    int chr;
-    StringBuff *buff = new_sbuff(4);
-    t_bool dot = t_false;
-    while ((chr = read_chr(lexer)) != END) {
-        if (is_digit(chr)) {
-            append_chr(buff, (char) chr);
-        } else if (chr == '.' && !dot) {
-            dot = t_true;
-            int pre_chr = chr;
-            chr = read_chr(lexer);
-            if (is_digit(chr)) {
-                append_chr(buff, (char) pre_chr);
-                append_chr(buff, (char) chr);
-                dot = t_true;
-            } else {
-                unread_chr(lexer, chr);
-                break;
-            }
-        } else {
-            unread_chr(lexer, chr);
-            break;
-        }
-    }
-    char *s = to_string(buff);
-    free(buff->body);
-    free(buff);
-    return s;
-}
-
-char *read_string(Lexer *lexer) {
-    int chr;
-    StringBuff *buff = new_sbuff(10);
-    int flag = 0;
-    while ((chr = read_chr(lexer)) != END) {
-        if (chr == '\'' || chr == '"') {
-            append_chr(buff, (char) chr);
-            if (flag && chr == buff_get(buff, 0)) {
-                break;
-            }
-            flag = 1;
-        } else {
-
-            append_chr(buff, (char) chr);
-        }
-    }
-    if (chr == END) {
-        lexer_error("String is not closed normally",
-                    to_string(buff),
-                    lexer->row_pos,
-                    lexer->col_pos);
-    }
-    char *s = to_string(buff);
-    free(buff->body);
-    free(buff);
-    return s;
-}
-
 KindMeta find_kind(char *kind) {
     for (int i = 0; i < kind_count; ++i) {
         if (strcmp(kind_table[i].name, kind) == 0) {
@@ -151,13 +75,75 @@ Token *new_end_token() {
     return token;
 }
 
+char *read_letter(Lexer *lexer, StringBuff* buff) {
+    int chr;
+    while ((chr = read_chr(lexer)) != END) {
+        // a_9 | a$9
+        if (is_letter(chr) || is_symbol(chr) || is_digit(chr) || chr < 0) {
+            append_chr(buff, (char) chr);
+        } else {
+            unread_chr(lexer, chr);
+            break;
+        }
+    }
+    return to_string(buff);;
+}
+
+char *read_digit(Lexer *lexer, StringBuff* buff) {
+    int chr;
+    t_bool dot = t_false;
+    while ((chr = read_chr(lexer)) != END) {
+        if (is_digit(chr)) {
+            append_chr(buff, (char) chr);
+        } else if (chr == '.' && !dot) {
+            dot = t_true;
+            int pre_chr = chr;
+            chr = read_chr(lexer);
+            if (is_digit(chr)) {
+                append_chr(buff, (char) pre_chr);
+                append_chr(buff, (char) chr);
+                dot = t_true;
+            } else {
+                unread_chr(lexer, chr);
+                break;
+            }
+        } else {
+            unread_chr(lexer, chr);
+            break;
+        }
+    }
+    return to_string(buff);
+}
+
+char *read_string(Lexer *lexer,StringBuff* buff) {
+    int chr;
+    int flag = 0;
+    while ((chr = read_chr(lexer)) != END) {
+        if (chr == '\'' || chr == '"') {
+            append_chr(buff, (char) chr);
+            if (flag && chr == buff_get(buff, 0)) {
+                break;
+            }
+            flag = 1;
+        } else {
+            append_chr(buff, (char) chr);
+        }
+    }
+    if (chr == END) {
+        lexer_error("String is not closed normally",
+                    to_string(buff),
+                    lexer->row_pos,
+                    lexer->col_pos);
+    }
+    return to_string(buff);;
+}
+
 /**
  * 多行注释
  */
-char *read_multi_note(Lexer *lexer) {
+char *read_multi_note(Lexer *lexer,StringBuff* buff) {
     int chr;
     int op;
-    StringBuff *buff = new_sbuff(20);
     while ((chr = read_chr(lexer))) {
         if (chr == '*') {
             op = read_chr(lexer);
@@ -181,18 +167,14 @@ char *read_multi_note(Lexer *lexer) {
         }
         append_chr(buff, (char) chr);
     }
-    char *s = to_string(buff);
-    free(buff->body);
-    free(buff);
-    return s;
+    return to_string(buff);
 }
 
 /**
  * 单行
  */
-char *read_single_note(Lexer *lexer) {
+char *read_single_note(Lexer *lexer, StringBuff* buff) {
     int chr;
-    StringBuff *buff = new_sbuff(20);
     while ((chr = read_chr(lexer))) {
         if (is_new_line(chr) || chr == END) {
             lexer->row_pos++;
@@ -200,115 +182,126 @@ char *read_single_note(Lexer *lexer) {
         }
         append_chr(buff, (char) chr);
     }
-    char *s = to_string(buff);
-    free(buff->body);
-    free(buff);
-    return s;
+    return to_string(buff);
+}
+
+/**
+ * 运算符
+ */
+Token *read_operator(Lexer* lexer, StringBuff* buff){
+    int chr = read_chr(lexer);
+    int op = read_chr(lexer);
+    /**
+     * ++  -- ....
+     */
+    switch (op) {
+        case '.':
+        case '+':
+        case '-':
+        case '&':
+        case '|':
+        case '>':
+        case '=': {
+            append_chr(buff, (char) chr);
+            append_chr(buff, (char) op);
+            char *s = to_string(buff);
+            KindMeta kind = find_kind(s);
+            return new_token(lexer, kind.kind, s);
+        }
+        case '/':
+        case '*': {
+            if (op == '/') {
+                // single
+                read_single_note(lexer, buff);
+            } else {
+                // multi
+                read_multi_note(lexer,  buff);
+            }
+            break;
+        }
+        default: {
+            unread_chr(lexer, op);
+            append_chr(buff, (char )chr);
+            return new_token(lexer, chr, to_string(buff));
+        }
+    }
+    append_chr(buff, (char)chr);
+    return new_token(lexer, EMPTY,to_string(buff));
+}
+
+Token* select_token(Lexer* lexer, int chr, StringBuff* buff){
+    switch (chr) {
+        case ' ':
+            break;
+        case '+':
+        case '-':
+        case '*':
+        case '/':
+        case '&':
+        case '|':
+        case '!':
+        case '(':
+        case ')':
+        case '{':
+        case '}':
+        case '%':
+        case '[':
+        case ']':
+        case '>':
+        case '<':
+        case '=':
+        case ',':
+        case '.':
+        case ':':
+        case ';':
+            unread_chr(lexer, chr);
+            return read_operator(lexer, buff);
+        case '\'':
+        case '"':
+            /**
+             *  处理字符串
+             *
+             */
+            unread_chr(lexer, chr);
+            return new_token(lexer, CONST_STRING, read_string(lexer, buff));
+        default: {
+            if (is_digit(chr)) {
+                unread_chr(lexer, chr);
+                return new_token(lexer, NUMBER, read_digit(lexer, buff));
+            } else if (is_letter(chr) || is_symbol(chr) || chr < 0) {
+                unread_chr(lexer, chr);
+                Kind kind;
+                char *c = read_letter(lexer, buff);
+                if ((kind = find_kind(c).kind) == EMPTY) {
+                    kind = ID;
+                }
+                return new_token(lexer, kind, c);
+            } else if (is_new_line(chr)) {
+                append_chr(buff, (char) chr);
+                return new_token(lexer, NEWLINE, to_string(buff));
+            }
+        }
+    }
+    append_chr(buff, (char)chr);
+    return new_token(lexer, EMPTY, to_string(buff));
 }
 
 void read_all(Lexer *lexer) {
     int chr;
     StringBuff *buff = new_sbuff(2);
+    Token* token;
     while ((chr = read_chr(lexer)) != END) {
         if (is_new_line(chr)) {
             lexer->col_pos = 1;
             lexer->row_pos++;
         }
         clear_buff(buff);
-        switch (chr) {
-            case '+':
-            case '-':
-            case '*':
-            case '/':
-            case '&':
-            case '|':
-            case '!':
-            case '(':
-            case ')':
-            case '{':
-            case '}':
-            case '%':
-            case '[':
-            case ']':
-            case '>':
-            case '<':
-            case '=':
-            case ',':
-            case '.':
-            case ':':
-            case ';': {
-                int op = read_chr(lexer);
-                /**
-                 * ++  -- ....
-                 */
-                switch (op) {
-                    case '.':
-                    case '+':
-                    case '-':
-                    case '&':
-                    case '|':
-                    case '>':
-                    case '=': {
-                        append_chr(buff, (char) chr);
-                        append_chr(buff, (char) op);
-                        char *s = to_string(buff);
-                        KindMeta kind = find_kind(s);
-                        list_add(lexer->tokens, new_token(lexer, kind.kind, s));
-                        break;
-                    }
-                    case '/':
-                    case '*': {
-                        if (op == '/') {
-                            // single
-                            read_single_note(lexer);
-                        } else {
-                            // multi
-                            read_multi_note(lexer);
-                        }
-                        break;
-                    }
-                    default: {
-                        unread_chr(lexer, op);
-                        append_chr(buff, '/');
-                        list_add(lexer->tokens, new_token(lexer, chr, to_string(buff)));
-                        break;
-                    }
-                }
-                break;
-            }
-            case '\'':
-            case '"':
-                /**
-                 *  处理字符串
-                 *
-                 */
-                unread_chr(lexer, chr);
-                list_add(lexer->tokens, new_token(lexer, STRING, read_string(lexer)));
-                break;
-            default: {
-                if (is_digit(chr)) {
-                    unread_chr(lexer, chr);
-                    list_add(lexer->tokens, new_token(lexer, NUMBER, read_digit(lexer)));
-                } else if (is_letter(chr) || is_symbol(chr)) {
-                    unread_chr(lexer, chr);
-                    Kind kind;
-                    char *c = read_letter(lexer);
-                    if ((kind = find_kind(c).kind) == EMPTY) {
-                        kind = ID;
-                    }
-                    list_add(lexer->tokens, new_token(lexer, kind, c));
-                } else if (is_new_line(chr)) {
-                    append_chr(buff, (char) chr);
-                    list_add(lexer->tokens, new_token(lexer, NEWLINE, to_string(buff)));
-                }
-            }
-        }
-
+        if ((token = select_token(lexer, chr, buff))->kind == EMPTY)continue;
+        list_add(lexer->tokens, token);
     }
     free(buff->body);
     free(buff);
 }
-
 
 /**
  * 填充 list

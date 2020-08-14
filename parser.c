@@ -377,7 +377,7 @@ void *parse_constant(Parser *parser) {
             move(parser);
             return new_var_term(token, NULL);
         case NUMBER:
-        case STRING:
+        case CONST_STRING:
             move(parser);
             return new_constant_term(token);
         default:
