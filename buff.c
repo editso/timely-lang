@@ -40,7 +40,7 @@ int re_sbuff(StringBuff* buff, unsigned int new_size){
     new_size = MALLOC_SIZE(char, +new_size);
     buff->buff_size = new_size;
     char* old_buff = buff->body;
-    char* new_buff = malloc(sizeof(char) * new_size);
+    char* new_buff = malloc(new_size);
     buff_zero(new_buff, new_size);
     if (new_buff == NULL)return t_false;
     buff->body = memcpy(new_buff, buff->body, buff->len);
@@ -80,7 +80,10 @@ void print_buff(StringBuff* buff){
 }
 
 void clear_buff(StringBuff* buff){
-    buff_zero(buff->body, buff->buff_size);
+    void* old = buff->body;
+    buff->body = malloc(sizeof(char) * buff->len * 2);
+    free(old);
+    buff->buff_size = buff->len;
     buff->len = 0;
 }
 
