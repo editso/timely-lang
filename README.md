@@ -4,7 +4,8 @@
     timely 2.0 是一个静态语言,正在开发中...
    
 ### 代码模板
-```public class Main:A,B{
+```
+public class Main:A,B{
     // 隐式类型转换
     private final a:int,b=10,c:char=10
     private name = 10
