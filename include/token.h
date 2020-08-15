@@ -5,6 +5,9 @@
 #ifndef TIMELY_LANG_TOKEN_H
 #define TIMELY_LANG_TOKEN_H
 
+#define col(token) token->col_pos
+#define row(token) token->row_pos
+#define kind(token) token->kind
 
 typedef enum {
     ID                  = 200, // 标识符
@@ -46,6 +49,7 @@ typedef enum {
     FLOAT               = 239, // float
     CHAR                = 240, // char
     VOID                = 241, // void
+    BOOL                = 242, // boolean
 
     THIS                = 242, // this
     ENUM                = 243, // enum
@@ -62,6 +66,7 @@ typedef enum {
     OR                  = 124,  // |
     EM                  = 33,   // !
     XOR                 = 94,   // ^
+    REV                 = 126, // ~
 
     MOD_EQ              = 180,  // %=
     AND_EQ              = 181,  // &=
@@ -90,8 +95,8 @@ typedef enum {
     BIG_EQ              = 161,  // >=
     EQ2                 = 163,  // ==
     EM_EQ               = 164,  // !=
-    LE2                 = 165,  // <<
-    BIG2                = 166,  // >>
+    LE2                 = 165,  // >>
+    BIG2                = 166,  // <<
 
     COLON               = 58,   // :
     SEMI                = 59,   // ;
@@ -121,6 +126,8 @@ typedef struct{
 static const KindMeta kind_table[] = {
         {ADD2,      "++"},
         {SUB2,      "--"},
+        {BIG2,"<<"},
+        {LE2,">>"},
         {EQ2,       "=="},
         {ADD_EQ,    "+="},
         {AND_EQ,    "&="},
@@ -158,6 +165,7 @@ static const KindMeta kind_table[] = {
         {PROTECTED, "protected"},
         {INTERFACE, "interface"},
         {STATIC,    "static"},
+        {FINAL,     "final"},
         {ANY,       "any"},
         {INT,       "int"},
         {FLOAT,     "float"},
@@ -167,6 +175,7 @@ static const KindMeta kind_table[] = {
         {ENUM,      "enum"},
         {DEFAULT,   "default"},
         {SWITCH,    "switch"},
+        {BOOL, "bool"},
         {CASE, "case"}
 };
 
@@ -197,6 +206,7 @@ KindMeta find_kind(char *kind);
 
 
 KindMeta get_kind_meta(Kind kind);
+
 
 
 #endif //TIMELY_LANG_TOKEN_H

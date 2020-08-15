@@ -1,37 +1,59 @@
 //
-// Created by zy on 8/7/20.
+// Created by zy on 8/14/20.
 //
 #include "include/parser.h"
 
-
 void move(Parser *parser) {
-    parser->token = lexer_read(parser->lexer);
-}
-
-
-Token *peek(Parser *parser, int index) {
-    return lexer_peek(parser->lexer, index);
+    if (stack_size(parser->stack) > 0) {
+        parser->token = pop(parser);
+    } else {
+        parser->token = lexer_read(parser->lexer);
+    }
 }
 
 void expect(Parser *parser, Kind kind) {
-    if (kind != GET_TOKEN(parser)->kind) {
-       errort(parser->lexer->source, GET_TOKEN(parser),"");
+    if (token(parser)->kind != kind) {
+        fprintf(stderr, "%s:%d:%d ERROR expect %s but appeared %s",
+                source(parser->lexer),
+                row(token(parser)),
+                col(token(parser)),
+                get_kind_meta(kind).name,
+                get_kind_meta(token(parser)->kind).name);
+        exit(1);
     }
     move(parser);
 }
 
-/**
- * 匹配一行结尾
- */
-void expect_end(Parser *parser) {
-    Token *token = GET_TOKEN(parser);
-    if (token->kind != NEWLINE && token->kind != SEMI && token->kind != END) {
-        print("在第 %d 行结尾需要 ';' 或另起一行(%d,%d),当前: %s",
-              token->row_pos,
-              token->row_pos,
-              token->col_pos,
-              token->text);
-        abort();
+Token* peek(Parser* parser){
+    Token* tok = lexer_read(parser->lexer);
+    push(parser, tok);
+    return tok;
+}
+
+t_bool is_modifier(Token* token){
+    switch (kind(token)) {
+        case PUBLIC:
+        case PROTECTED:
+        case PRIVATE:
+        case STATIC:
+        case FINAL:
+            return t_true;
+        default:
+            return t_false;
+    }
+}
+
+t_bool is_basic_type(Token* token){
+    switch (kind(token)) {
+        case INT:
+        case CHAR:
+        case FLOAT:
+        case STATIC:
+        case BOOL:
+        case ANY:
+            return t_true;
+        default:
+            return t_false;
     }
 }
 
@@ -39,48 +61,127 @@ Parser *new_parser(Lexer *lexer) {
     Parser *parser = malloc(sizeof(Parser));
     parser->lexer = lexer;
     parser->root = new_tree(new_list());
-    parser->stack =new_stack();
+    parser->stack = new_stack();
     return parser;
-}
-
-void *parse_stmt(Parser *parser) {
-    Token *token;
-    switch ((token = GET_TOKEN(parser))->kind) {
-        case COMM:
-            move(parser);
-            return new_empty(token);
-        case ID:
-            return parse_id(parser);
-        case FUN:
-            return parse_fun(parser);
-        case WHILE:
-            return parse_while(parser);
-        case TRY:
-            return parse_try(parser);
-        case SEMI:
-        case NEWLINE:
-            return new_empty(token);
-        case CLASS:
-            return parse_class(parser);
-        default:
-            return parse_expr(parser);
-    }
 }
 
 Tree *parse(Parser *parser) {
     move(parser);
-    while (GET_TOKEN(parser)->kind != END) {
-//        list_add(parser->root->stmts, parse_stmt(parser));
-        out_token(GET_TOKEN(parser));
+    while (token(parser)->kind != END) {
+        list_add(parser->root->stmts, parse_stmt(parser));
         move(parser);
     }
     return parser->root;
 }
 
-void *parse_block(Parser *parser) {
+void *parse_stmt(Parser *parser) {
+    Token* tok = token(parser);
+    switch (tok->kind) {
+        case INTERFACE:
+        case ID:
+        case CLASS:
+        case FUN:
+        case PROTECTED:
+        case PRIVATE:
+        case PUBLIC:
+        case STATIC:
+        case FINAL:
+            return parse_modifier(parser);
+        case IF:
+            return parse_if(parser);
+        case WHILE:
+            return parse_while(parser);
+        case TRY:
+            return parse_try(parser);
+        case SWITCH:
+            return parse_switch(parser);
+        case NEWLINE:
+            return new_empty(tok);
+        case ADD2:
+        case SUB2:
+        case BREAK:
+        case RETURN:
+        case NUMBER:
+        case THIS:
+        case DOT:
+        case OP_BRA:
+        case CL_BRA:
+            // TODO 后期写
+            return new_empty(token(parser));
+        default:
+            fprintf(stderr, "%s: Illegal expression: %s",
+                    get_token_pos(tok),
+                    get_kind_meta(tok->kind).name);
+            exit(1);
+    }
+}
+
+void* parse_modifier(Parser* parser){
+    Token* tok = token(parser);
+    List* modifiers = new_list();
+    while (is_modifier(tok)){
+        list_add(modifiers, tok);
+        move(parser);
+        tok = token(parser);
+    }
+    return parse_id(parser, new_modifier(modifiers));
+}
+
+void* parse_id(Parser* parser, Modifier* modifier){
+    Token* tok = token(parser);
+    switch (kind(tok)) {
+        case CLASS:
+            move(parser);
+            return parse_class(parser, modifier);
+        case FUN:
+            move(parser);
+            return parse_fun(parser, modifier);
+        case ID:{
+            if (peek(parser)->kind == OP_BRA){
+                free(modifier->modifiers);
+                free(modifier);
+                return parse_call(parser);
+            }
+            return parse_variable(parser, modifier);
+        }
+        default:
+            fprintf(stderr, "%s Unprocessable statement: %s", get_token_pos(tok),get_kind_meta(kind(tok)).name);
+            exit(0);
+    }
+}
+
+void *parse_class(Parser *parser, Modifier* modifier){
+    Token* name = token(parser);
+    expect(parser, ID);
+    List* extends = new_list();
+    if (token(parser)->kind == COLON){
+        // 解析继承关系
+        move(parser);
+        push(parser,token(parser));
+        expect(parser,ID);
+        Token* super;
+        Token* next;
+        while ((super = token(parser))->kind != OP_FL_BRA){
+            next = peek(parser);
+            if (super->kind == ID){
+                list_add(extends, super);
+            }else if (super->kind != COMM && super->kind != NEWLINE || super->kind == COMM && next->kind != ID){
+                fprintf(stderr, "Unacceptable statement! expect %s but appeared %s",
+                        get_kind_meta(ID).name,
+                        get_kind_meta(super->kind).name);
+                exit(1);
+            }
+            move(parser);
+        }
+    }
+    BlockStmt* block = parse_class_block(parser);
+    return new_class_stmt(name, extends, block, modifier);
+}
+
+void* parse_class_block(Parser* parser){
     expect(parser, OP_FL_BRA);
-    List *stmts = new_list();
-    while (GET_TOKEN(parser)->kind != CL_FL_BRA) {
+    List* stmts = new_list();
+    while (token(parser)->kind != CL_FL_BRA && token(parser)->kind != END){
         list_add(stmts, parse_stmt(parser));
         move(parser);
     }
@@ -88,157 +189,314 @@ void *parse_block(Parser *parser) {
     return new_block_stmt(stmts);
 }
 
-void *parse_expr(Parser *parser) {
-    void *left = parse_or(parser);
-    Token *token = GET_TOKEN(parser);
-    while (t_true) {
-        // 解析二元表达式
-        switch (token->kind) {
-            case ADD:
-            case SUB:
-            case ADD_EQ:
-            case SUB_EQ:
-            case DIV_EQ:
-            case DIV:
-            case MUL:
-            case MOD:
-                token = GET_TOKEN(parser);
-                move(parser);
-                return new_binary_expr(left, token, parse_or(parser));
-            default:
-                return left;
-        }
-    }
-}
-
-void *parse_fun(Parser *parser) {
-    Token *token = GET_TOKEN(parser);
-    move(parser);
-    List *args = new_list();
-    if (peek(parser, 0)->kind != OP_FL_BRA) {
-        move(parser);
-        expect(parser, OP_BRA);
-        while (GET_TOKEN(parser)->kind != CL_BRA) {
-            if (GET_TOKEN(parser)->kind == COMM) {
-                move(parser);
-                continue;
-            }
-            list_add(args, parse_expr(parser));
-        }
-        expect(parser, CL_BRA);
-    } else {
-        move(parser);
-    }
-    return new_fun_stmt(token, args, parse_block(parser));
-}
-
-void *parse_id(Parser *parser) {
-    Token *token = GET_TOKEN(parser);
-    Token *peek_token = peek(parser, 0);
-    switch (peek_token->kind) {
-        case EQ: {
-            move(parser);
-            move(parser);
-            void *var = new_var_term(token, parse_expr(parser));
-            expect_end(parser);
-            return var;
-        }
-        case NEWLINE:
-        case COMM:
-            return new_var_term(token, NULL);
-        default:
-            return parse_expr(parser);
-    }
-}
-
-void *parse_catch(Parser *parser) {
-    move(parser);
-    expect(parser, ID);
-    ConstantTerm *var = new_constant_term(GET_TOKEN(parser));
-    void *block = parse_block(parser);
-    return new_catch_stmt(var, block);
-}
-
-void *parse_try(Parser *parser) {
-    move(parser);
-    void *block = parse_block(parser);
-    List *stmts = new_list();
-    while (GET_TOKEN(parser)->kind == CATCH) {
-        list_add(stmts, parse_catch(parser));
-    }
-    void *stmt = NULL;
-    if (GET_TOKEN(parser)->kind == FINALLY) {
-        move(parser);
-        stmt = parse_block(parser);
-    }
-    return new_try_stmt(block, stmts, stmt);
-}
-
-
-void *parse_while(Parser *parser) {
-    Token *token = GET_TOKEN(parser);
+void* parse_fun(Parser* parser, Modifier* modifier){
+    print("%s",__FUNCTION__);
+    Token* name = token(parser);
     move(parser);
     expect(parser, OP_BRA);
-    void *expr = parse_expr(parser);
-    expect(parser, CL_BRA);
-    void *stmt = new_while_stmt(token, expr, parse_block(parser));
-    return stmt;
+    List* args = new_list();
+    while (token(parser)->kind != CL_BRA){
+        list_add(args, parse_stmt(parser));
+        if (token(parser)->kind != CL_BRA){
+            expect(parser,COMM);
+        }
+    }
+    expect(parser,CL_BRA);
+    void* block = parse_block(parser);
+    return new_fun_stmt(name, args, block, modifier);
+}
+
+void* parse_variable(Parser* parser, Modifier* modifier){
+    Token* name = token(parser);
+    expect(parser, ID);
+    if (token(parser)->kind == COLON){
+        move(parser);
+        Token* type =  token(parser);
+        if (!is_basic_type(token(parser))){
+            expect(parser, ID);
+        }else{
+            move(parser);
+        }
+        if (token(parser)->kind == COMM){
+            List *variables  = new_list();
+            do {
+                move(parser);
+                list_add(variables, new_var_term(name, NULL, new_type(type), modifier));
+                name = token(parser);
+                expect(parser, ID);
+                if (token(parser)->kind == EQ || token(parser)->kind == DOT){
+                    move(parser);
+                    list_add(variables, new_var_term(name, parse_expr(parser), new_type(NULL), modifier));
+                }else if (token(parser)->kind == COLON){
+                    move(parser);
+                    type = token(parser);
+                    if (!is_basic_type(token(parser))){
+                        expect(parser, ID);
+                    }
+                    move(parser);
+                } else {
+                    fprintf(stderr,"%s: Variable type is ambiguous: %s",
+                            get_token_pos(name),
+                            get_kind_meta(name->kind).name);
+                    exit(1);
+                }
+                if (token(parser)->kind == EQ){
+                    move(parser);
+                    list_add(variables, new_var_term(name, parse_expr(parser), new_type(NULL), modifier));
+                }
+//                else if (token(parser)->kind != COMM
+//                        && token(parser)->kind != NEWLINE
+//                        && token(parser)->kind != END){
+//                    out_token(token(parser));
+//                    fprintf(stderr,"%s: Variable type is ambiguous: %s",
+//                            get_token_pos(name),
+//                            get_kind_meta(name->kind).name);
+//                    exit(1);
+//                }
+            }while (token(parser)->kind == COMM || token(parser)->kind == ID);
+            return new_stmt(variables);
+        }else if (token(parser)->kind == EQ){
+            move(parser);
+            return new_var_term(name, parse_expr(parser), new_type(NULL), modifier);
+        }
+    }else if (token(parser)->kind == EQ || token(parser)->kind == DOT){
+        move(parser);
+        return new_var_term(name, parse_expr(parser), new_type(NULL), modifier);
+    }else{
+        // 变量类型不明确
+        fprintf(stderr,"%s: Variable type is ambiguous: %s",
+                get_token_pos(name),
+                get_kind_meta(name->kind).name);
+        exit(1);
+    }
+    return NULL;
+}
+
+void* parse_block(Parser* parser){
+    expect(parser, OP_FL_BRA);
+    List* stmts = new_list();
+    while (token(parser)->kind != CL_FL_BRA){
+        list_add(stmts,parse_stmt(parser));
+        move(parser);
+    }
+    expect(parser,CL_FL_BRA);
+    return new_block_stmt(stmts);
+}
+
+void* parse_call(Parser* parser){
+    return NULL;
+}
+
+void* parse_if(Parser* parser){
+    expect(parser, IF);
+    expect(parser, OP_BRA);
+    void* expr = parse_expr(parser);
+    expect(parser,CL_BRA);
+    List* elseif = new_list();
+    void* elsexpr = NULL;
+    void* block  = parse_block(parser);
+    while (token(parser)->kind == ELSE){
+        if (elsexpr != NULL){
+            fprintf(stderr,"%s: Invalid statement: %s",
+                    get_token_pos(token(parser)),
+                    get_kind_meta(token(parser)->kind).name);
+            exit(1);
+        }
+        move(parser);
+        if (token(parser)->kind == IF){
+            move(parser);
+            expect(parser, OP_BRA);
+            void* exr = parse_expr(parser);
+            expect(parser,CL_BRA);
+            list_add(elseif, new_if_stmt(exr, parse_block(parser),NULL,NULL));
+        }else{
+            push(parser,token(parser));
+            expect(parser,OP_FL_BRA);
+            elsexpr = parse_block(parser);
+        }
+    }
+    return new_if_stmt(expr, block,elseif, elsexpr);
+}
+
+void *parse_while(Parser *parser){
+    print("%s",__FUNCTION__);
+    expect(parser,WHILE);
+    expect(parser, OP_BRA);
+    void* expr = parse_expr(parser);
+    expect(parser,CL_BRA);
+    return new_while_stmt(expr,  parse_block(parser));
+}
+
+void *parse_try(Parser *parser){
+    expect(parser, TRY);
+    expect(parser,OP_FL_BRA);
+    List* stmts = new_list();
+    while (token(parser)->kind != CL_FL_BRA){
+        list_add(stmts,parse_stmt(parser));
+        move(parser);
+    }
+    expect(parser,CL_FL_BRA);
+    List* catch = new_list();
+    while (token(parser)->kind == CATCH){
+        expect(parser,CATCH);
+        Token* name = token(parser);
+        expect(parser,ID);
+        expect(parser,COLON);
+        Token* type = token(parser);
+        if (!is_basic_type(token(parser))){
+            expect(parser,ID);
+        }
+        list_add(catch, new_catch_stmt(new_var_term(name, NULL,new_type(type),NULL),
+                                       parse_block(parser)));
+    }
+    void* finally = NULL;
+    if (token(parser)->kind == FINALLY){
+        expect(parser,FINALLY);
+        finally = parse_block(parser);
+    }
+    return new_try_stmt(stmts, catch, finally);
 }
 
 
-/**
- * |
- */
-void *parse_or(Parser *parser) {
-    void *left = parser_xor(parser);
-    Token *token = GET_TOKEN(parser);
-    while (GET_TOKEN(parser)->kind == OR) {
-        token = GET_TOKEN(parser);
+void* parse_switch(Parser *parser){
+    expect(parser, SWITCH);
+    Token* id = token(parser);
+    out_token(token(parser));
+    expect(parser,ID);
+    expect(parser,OP_FL_BRA);
+    List* case_stmt = new_list();
+    List *block;
+    void* def_expr =  NULL;
+    while (token(parser)->kind != CL_FL_BRA){
+        if (token(parser)->kind == END){
+            expect(parser, CL_FL_BRA);
+        }
+        if (def_expr != NULL){
+            fprintf(stderr,"%s: Invalid statement: %s",
+                    get_token_pos(token(parser)),
+                    get_kind_meta(token(parser)->kind).name);
+            exit(1);
+        }
         move(parser);
-        left = new_binary_expr(left, token, parser_xor(parser));
+        if (token(parser)->kind == CASE){
+            expect(parser, CASE);
+            void* constant = parse_constant(parser);
+            expect(parser,COLON);
+            if (token(parser)->kind == OP_FL_BRA){
+                list_add(case_stmt, new_case_stmt(constant, parse_block(parser)));
+                move(parser);
+            }else{
+                block = new_list();
+                while (t_true){
+                    if (token(parser)->kind == CASE ||
+                        token(parser)->kind == DEFAULT ||
+                        token(parser)->kind ==CL_FL_BRA)
+                        break;
+                    out_token(token(parser));
+                    list_add(block, parse_stmt(parser));
+                    move(parser);
+                }
+                list_add(case_stmt, new_block_stmt(block));
+                push(parser, token(parser));
+            }
+        }else if (token(parser)->kind == DEFAULT){
+            move(parser);
+            expect(parser,COLON);
+            if (token(parser)->kind == OP_FL_BRA){
+                def_expr = parse_block(parser);
+            }else{
+                block = new_list();
+                while (token(parser)->kind != END &&
+                       token(parser)->kind != CL_FL_BRA &&
+                       token(parser)->kind != CASE){
+                    list_add(block, parse_stmt(parser));
+                    move(parser);
+                }
+                def_expr = new_block_stmt(block);
+            }
+        }
+    }
+    expect(parser,CL_FL_BRA);
+    return new_switch_stmt(new_constant_term(id), case_stmt, def_expr);
+}
+
+
+void* parse_expr(Parser* parser){
+    return parse_logic(parser);
+}
+
+/**
+ * &&,||
+ */
+void* parse_logic(Parser *parser){
+    void* left = parse_or(parser);
+    Token* tok = token(parser);
+    switch (token(parser)->kind) {
+        case AND2:
+        case OR2:
+            move(parser);
+            return new_binary_expr(left, tok, parse_bit_move(parser));
+        default:
+            return left;
+    }
+}
+
+/**
+ * or
+ */
+void* parse_or(Parser* parser){
+    void* left = parse_xor(parser);
+    Token* tok = token(parser);
+    while (token(parser)->kind == OR){
+        tok = token(parser);
+        move(parser);
+        left = new_binary_expr(left, tok, parse_and(parser));
+    }
+    return left;
+}
+
+
+void* parse_xor(Parser* parser){
+    void* left = parse_and(parser);
+    Token* tok = token(parser);
+    while (token(parser)->kind == XOR){
+        tok = token(parser);
+        move(parser);
+        left = new_binary_expr(left, tok, parse_and(parser));
     }
     return left;
 }
 
 /**
- * ^
+ *
  */
-void *parser_xor(Parser *parser) {
-    void *left = parse_and(parser);
-    Token *token = GET_TOKEN(parser);
-    while (GET_TOKEN(parser)->kind == XOR) {
-        token = GET_TOKEN(parser);
+void* parse_and(Parser* parser){
+    void* left = parse_equals(parser);
+    Token* tok = token(parser);
+    while (token(parser)->kind == AND){
+        tok = token(parser);
         move(parser);
-        left = new_binary_expr(left, token, parse_and(parser));
+        left = new_binary_expr(left, tok, parse_equals(parser));
+
     }
     return left;
 }
 
 /**
- * &
+ * !=, ==, >, <, >= <=
  */
-void *parse_and(Parser *parser) {
-    void *left = parse_eq(parser);
-    Token *token = GET_TOKEN(parser);
-    while (GET_TOKEN(parser)->kind == AND) {
-        token = GET_TOKEN(parser);
-        move(parser);
-        left = new_binary_expr(left, token, parse_eq(parser));
-    }
-    return left;
-}
-
-/**
- * !=, ==
- */
-void *parse_eq(Parser *parser) {
-    void *left = parse_bit_move(parser);
-    Token *token = GET_TOKEN(parser);
-    switch (token->kind) {
+void *parse_equals(Parser *parser){
+    void* left = parse_bit_move(parser);
+    Token* tok = token(parser);
+    switch (token(parser)->kind) {
         case EM_EQ:
         case EQ2:
+        case BIG:
+        case LE:
+        case LE_EQ:
+        case BIG_EQ:
             move(parser);
-            return new_binary_expr(left, token, parse_bit_move(parser));
+            return new_binary_expr(left, tok, parse_bit_move(parser));
         default:
             return left;
     }
@@ -247,162 +505,175 @@ void *parse_eq(Parser *parser) {
 /**
  * << >>
  */
-void *parse_bit_move(Parser *parser) {
-    void *left = parse_add_sub(parser);
-    Token *token = GET_TOKEN(parser);
-    while (t_true) {
-        switch (token->kind) {
-            case LE2:
-            case BIG2:
-                token = GET_TOKEN(parser);
-                move(parser);
-                return new_binary_expr(left, token, parse_add_sub(parser));
-            default:
-                return left;
-        }
+void* parse_bit_move(Parser* parser){
+    void* left = parse_add_sub(parser);
+    Token* tok = token(parser);
+    while (kind(tok) == LE2 || kind(tok) == BIG2){
+        tok = token(parser);
+        move(parser);
+        left = new_binary_expr(left, tok, parse_start(parser));
     }
+    return left;
 }
 
 /**
- * +, -
- * @param parser
- * @return
+ * + -
  */
-void *parse_add_sub(Parser *parser) {
-    void *left = parse_mul_div(parser);
-    Token *token = GET_TOKEN(parser);
-    while (t_true) {
-        switch (token->kind) {
-            case ADD:
-            case SUB:
-                token = GET_TOKEN(parser);
-                move(parser);
-                return new_binary_expr(left, token, parse_mul_div(parser));
-            default:
-                return left;
-        }
+void* parse_add_sub(Parser* parser){
+    void* left = parse_mul_div(parser);
+    Token* tok = token(parser);
+    while (kind(tok) == ADD || kind(tok) == SUB){
+        tok = token(parser);
+        move(parser);
+        left = new_binary_expr(left, tok, parse_start(parser));
     }
-}
-
-
-/**
- * *, /, %
- * @param parser
- */
-void *parse_mul_div(Parser *parser) {
-    void *left = parse_start(parser);
-    Token *token = GET_TOKEN(parser);
-    while (t_true) {
-        switch (token->kind) {
-            case MUL:
-            case DIV:
-            case MOD:
-                token = GET_TOKEN(parser);
-                move(parser);
-                return new_binary_expr(left, token, parse_start(parser));
-            default:
-                return left;
-        }
-    }
+    return left;
 }
 
 /**
- * 前缀表达式
- * ++a, !b, --a
+ * * /
  */
-void *parse_start(Parser *parser) {
-    Token *token = GET_TOKEN(parser);
-    while (t_true) {
-        switch (GET_TOKEN(parser)->kind) {
-            case ADD2:
-            case SUB2:
-            case EM:
-                token = GET_TOKEN(parser);
-                move(parser);
-                return new_start_term(token, parse_end);
-            default:
-                return parse_end(parser);
-        }
+void* parse_mul_div(Parser* parser){
+    void* left = parse_start(parser);
+    Token* tok = token(parser);
+    while (kind(tok) == MUL || kind(tok) == DIV){
+        tok = token(parser);
+        move(parser);
+        left = new_binary_expr(left, tok, parse_start(parser));
     }
+    return left;
 }
 
 /**
- * 后缀表达式
- * a++, b--, (), .
+ * ++, --, !, ~,-
  */
-void *parse_end(Parser *parser) {
-    void *left = parse_constant(parser);
-    Token *token = GET_TOKEN(parser);
-    while (t_true) {
-        switch (token->kind) {
-            case ADD2:
-            case SUB2: {
-                move(parser);
-                return new_end_term(token, left);
+void* parse_start(Parser* parser){
+    void* left = NULL;
+    Token* tok = token(parser);
+    StartTerm* expr = NULL;
+    void* **p;
+    while (kind(tok) == AND2 || kind(tok) == SUB2){
+        tok = token(parser);
+        move(parser);
+        if (left == NULL){
+            expr = new_start_term(tok, NULL);
+            p = expr->expr;
+        }else{
+            expr = new_start_term(tok, expr);
+        }
+    }
+    switch (kind(tok)) {
+        case EM:
+        case REV:
+        case SUB:{
+            if (expr ==  NULL){
+                return new_start_term(tok, parse_end(parser));
+            }else{
+                expr = new_start_term(tok, expr);
             }
-            case OP_BRA: {
-                token = GET_TOKEN(parser);
-                List *args = new_list();
-                do {
-                    move(parser);
-                    if (GET_TOKEN(parser)->kind == COMM) {
+            break;
+        }
+        default:
+            return parse_end(parser);
+    }
+    *p = parse_end(parser);
+    return expr;
+}
+
+/**
+ * ++, --, &,  [], (), .
+ */
+void* parse_end(Parser* parser){
+    void* left = parse_constant(parser);
+    Token* tok = token(parser);
+    switch (kind(tok)) {
+        case AND2:
+        case SUB2:{
+            // ++, ----
+            EndTerm* end = NULL;
+            void** p;
+            while (t_true){
+                switch (kind(tok)) {
+                    case AND2:
+                    case SUB2:
+                        tok = token(parser);
                         move(parser);
+                        if (end == NULL){
+                            end = new_end_term(tok, NULL);
+                            p = end->expr;
+                        }else{
+                            end = new_end_term(tok, end);
+                        }
                         continue;
-                    } else if (GET_TOKEN(parser)->kind == CL_BRA) {
+                    default:
                         break;
-                    }
-                    list_add(args, parse_expr(parser));
-                    if (GET_TOKEN(parser)->kind == CL_BRA) {
-                        break;
-                    }
-                } while (t_true);
-                expect(parser, CL_BRA);
-                expect_end(parser);
-                return new_call_term(left, args);
+                }
+                if (end != NULL){
+                    *p = left;
+                }else{
+                    break;
+                }
             }
-            case DOT:
-            default:
-                return left;
+            return end;
         }
+        case AND:
+            return new_end_term(tok, left);
+        case OP_SQ_BRA:{
+            move(parser);
+            void* expr = parse_expr(parser);
+            expect(parser,CL_FL_BRA);
+            return new_array_subscript(left, expr);
+        }
+        case OP_BRA:{
+            move(parser);
+            List* args = new_list();
+            while (token(parser)->kind != CL_BRA){
+                list_add(args, parse_expr(parser));
+                move(parser);
+                if (token(parser)->kind == COMM){
+                    move(parser);
+                    continue;
+                }
+                if(token(parser)->kind != CL_BRA){
+                    fprintf(stderr, "%s: Illegal expression: %s",
+                            get_token_pos(tok),
+                            get_kind_meta(tok->kind).name);
+                    exit(1);
+                }
+            }
+            expect(parser,CL_BRA);
+            return new_call_term(left, args);
+        }
+        case DO:{
+            move(parser);
+            if (peek(parser)->kind != ID){
+                fprintf(stderr, "%s: Illegal expression: %s",
+                        get_token_pos(tok),
+                        get_kind_meta(tok->kind).name);
+                exit(1);
+            }
+            return new_select_member(left, parse_expr(parser));
+        }
+        default:
+            return left;
     }
 }
 
 /**
  * 1,2,3,5,a,b,c,d
  */
-void *parse_constant(Parser *parser) {
-    Token *token = GET_TOKEN(parser);
-    switch (token->kind) {
+void *parse_constant(Parser *parser){
+    Token* tok = token(parser);
+    switch (kind(tok)) {
+        case NUMBER:
+        case FLOAT:
         case ID:
             move(parser);
-            return new_var_term(token, NULL);
-        case NUMBER:
-        case CONST_STRING:
-            move(parser);
-            return new_constant_term(token);
+            return new_constant_term(tok);
         default:
-            errort(parser->lexer->source, token, "无法解析的表达式");
+            fprintf(stderr, "%s: Illegal expression: %s",
+                    get_token_pos(tok),
+                    get_kind_meta(tok->kind).name);
+            exit(1);
     }
-    return NULL;
-}
-
-void *parse_class(Parser *parser) {
-    move(parser);
-    Token* name = GET_TOKEN(parser);
-    expect(parser, ID);
-    List *parent = new_list();
-    if (GET_TOKEN(parser)->kind == COLON) {
-        expect(parser, COLON);
-        Token* token;
-        while (((token = GET_TOKEN(parser))->kind != OP_FL_BRA)){
-            if (token->kind != COMM){
-                expect(parser, ID);
-                list_add(parent, new_constant_term(token));
-                continue;
-            }
-            move(parser);
-        }
-    }
-    void* block = parse_block(parser);
-    return new_class_stmt(name, parent, block);
 }

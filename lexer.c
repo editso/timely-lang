@@ -158,6 +158,7 @@ char *read_multi_note(Lexer *lexer,StringBuff* buff) {
         }
         if (is_new_line(chr)) {
             lexer->row_pos++;
+            lexer->col_pos = 1;
         }
         if (chr == END) {
             lexer_error("note is not closed normally",
@@ -178,6 +179,7 @@ char *read_single_note(Lexer *lexer, StringBuff* buff) {
     while ((chr = read_chr(lexer))) {
         if (is_new_line(chr) || chr == END) {
             lexer->row_pos++;
+            lexer->col_pos = 1;
             break;
         }
         append_chr(buff, (char) chr);

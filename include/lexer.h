@@ -8,6 +8,7 @@
 #include "token.h"
 #include "list.h"
 #include "stdio.h"
+#define source(lexer) lexer->source
 
 
 typedef struct lexer{

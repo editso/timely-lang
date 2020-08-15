@@ -7,12 +7,14 @@
 
 
 KindMeta get_kind_meta(Kind kind){
+    StringBuff* buff = new_sbuff(2);
     if (kind != NEWLINE && kind >= 0 && kind <= 127){
         KindMeta* meta = malloc(sizeof(KindMeta));
-        char* s = malloc(sizeof(s));
-        *s = (char)kind;
+        append_chr(buff, (char)kind);
         meta->kind = kind;
-        meta->name = s;
+        meta->name = to_string(buff);
+        free(buff->body);
+        free(buff);
         return *meta;
     }else{
         for (int i = 0; i < kind_count; ++i) {
@@ -52,8 +54,10 @@ char* get_token_pos(Token* token){
     StringBuff* buff = new_sbuff(4);
     append_chr(buff, '(');
     append_str(buff, itochr((int)token->row_pos));
+    append_chr(buff, ',');
     append_str(buff, itochr((int)token->col_pos));
     append_chr(buff, ')');
+    append_chr(buff,'\0');
     char* s = to_string(buff);
     free(buff->body);
     free(buff);

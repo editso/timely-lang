@@ -4,6 +4,7 @@
 
 #ifndef TIMELY_LANG_STACK_H
 #define TIMELY_LANG_STACK_H
+#define stack_size(stack) stack->size
 
 typedef struct stack_{
     /**
