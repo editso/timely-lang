@@ -435,7 +435,7 @@ void* parse_logic(Parser *parser){
         case AND2:
         case OR2:
             move(parser);
-            return new_binary_expr(left, tok, parse_bit_move(parser));
+            return new_binary_expr(left, tok, parse_or(parser));
         default:
             return left;
     }
