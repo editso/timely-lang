@@ -450,7 +450,7 @@ void* parse_or(Parser* parser){
     while (token(parser)->kind == OR){
         tok = token(parser);
         move(parser);
-        left = new_binary_expr(left, tok, parse_and(parser));
+        left = new_binary_expr(left, tok, parse_xor(parser));
     }
     return left;
 }
@@ -511,7 +511,7 @@ void* parse_bit_move(Parser* parser){
     while (kind(tok) == LE2 || kind(tok) == BIG2){
         tok = token(parser);
         move(parser);
-        left = new_binary_expr(left, tok, parse_start(parser));
+        left = new_binary_expr(left, tok, parse_add_sub(parser));
     }
     return left;
 }
@@ -525,7 +525,7 @@ void* parse_add_sub(Parser* parser){
     while (kind(tok) == ADD || kind(tok) == SUB){
         tok = token(parser);
         move(parser);
-        left = new_binary_expr(left, tok, parse_start(parser));
+        left = new_binary_expr(left, tok, parse_mul_div(parser));
     }
     return left;
 }
