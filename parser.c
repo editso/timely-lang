@@ -57,6 +57,27 @@ t_bool is_basic_type(Token* token){
     }
 }
 
+t_bool is_operator(Token* token){
+    switch (token->kind) {
+        case ADD2:
+        case SUB2:
+        case BIG_EQ:
+        case LE_EQ:
+        case DIV_EQ:
+        case SUB_EQ:
+        case MUL_EQ:
+        case MOD_EQ:
+        case OR_EQ:
+        case EM_EQ:
+        case ADD_EQ:
+        case AND_EQ:
+        case XOR_EQ:
+            return t_true;
+        default:
+            return t_false;
+    }
+}
+
 Parser *new_parser(Lexer *lexer) {
     Parser *parser = malloc(sizeof(Parser));
     parser->lexer = lexer;
@@ -150,6 +171,7 @@ void* parse_id(Parser* parser, Modifier* modifier){
     }
 }
 
+
 void *parse_class(Parser *parser, Modifier* modifier){
     Token* name = token(parser);
     expect(parser, ID);
@@ -224,7 +246,7 @@ void* parse_variable(Parser* parser, Modifier* modifier){
                 list_add(variables, new_var_term(name, NULL, new_type(type), modifier));
                 name = token(parser);
                 expect(parser, ID);
-                if (token(parser)->kind == EQ || token(parser)->kind == DOT){
+                if (token(parser)->kind == EQ || token(parser)->kind == DOT || is_operator(token(parser))){
                     move(parser);
                     list_add(variables, new_var_term(name, parse_expr(parser), new_type(NULL), modifier));
                 }else if (token(parser)->kind == COLON){
@@ -259,7 +281,7 @@ void* parse_variable(Parser* parser, Modifier* modifier){
             move(parser);
             return new_var_term(name, parse_expr(parser), new_type(NULL), modifier);
         }
-    }else if (token(parser)->kind == EQ || token(parser)->kind == DOT){
+    }else if (token(parser)->kind == EQ || token(parser)->kind == DOT || is_operator(token(parser))){
         move(parser);
         return new_var_term(name, parse_expr(parser), new_type(NULL), modifier);
     }else{
@@ -361,7 +383,7 @@ void *parse_try(Parser *parser){
 void* parse_switch(Parser *parser){
     expect(parser, SWITCH);
     Token* id = token(parser);
-    out_token(token(parser));
+//    out_token(token(parser));
     expect(parser,ID);
     expect(parser,OP_FL_BRA);
     List* case_stmt = new_list();
@@ -384,7 +406,6 @@ void* parse_switch(Parser *parser){
             expect(parser,COLON);
             if (token(parser)->kind == OP_FL_BRA){
                 list_add(case_stmt, new_case_stmt(constant, parse_block(parser)));
-                move(parser);
             }else{
                 block = new_list();
                 while (t_true){
@@ -392,7 +413,7 @@ void* parse_switch(Parser *parser){
                         token(parser)->kind == DEFAULT ||
                         token(parser)->kind ==CL_FL_BRA)
                         break;
-                    out_token(token(parser));
+//                    out_token(token(parser));
                     list_add(block, parse_stmt(parser));
                     move(parser);
                 }

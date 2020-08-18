@@ -16,6 +16,7 @@ int main(int argc, char **argv) {
     signal(SIGSEGV, handler);
     signal(SIGABRT, handler);
     signal(SIGFPE, handler);
+
     try(buf) {
         Lexer *lexer = new_lexer(argv[1]);
         Parser *parser = new_parser(lexer);
