@@ -16,14 +16,13 @@ int main(int argc, char **argv) {
     signal(SIGSEGV, handler);
     signal(SIGABRT, handler);
     signal(SIGFPE, handler);
-
+    level = LOG_LEVEL_ERROR;
     try(buf) {
         Lexer *lexer = new_lexer(argv[1]);
         Parser *parser = new_parser(lexer);
         GET_EVAL(parse(parser))->eval(NULL, parser->root);
-
     } catch(4) {
-        print("遇到错误,程序结束:%d", errno);
+        log_error("遇到错误!!");
     }
     return 0;
 }

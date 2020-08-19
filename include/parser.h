@@ -16,6 +16,16 @@
 #define push(parser, token) stack_push(parser->stack, token)
 #define pop(parser) stack_pop(parser->stack)
 
+
+
+#define parse_error(parser, format, ...)  log_code( \
+source(parser->lexer),                       \
+row(parser->token),                          \
+col(parser->token),                          \
+format,                                     \
+__VA_ARGS__)
+
+
 typedef struct parser_ {
     Lexer *lexer;
     Tree *root;
@@ -31,7 +41,6 @@ t_bool is_basic_type(Token *token);
 void *parse_variable(Parser *parser, Modifier *modifier);
 
 void *parse_call(Parser *parser);
-
 
 void *parse_modifier(Parser *parser);
 
@@ -79,7 +88,8 @@ void *parse_fun(Parser *parser, Modifier *modifier);
  */
 void *parse_while(Parser *parser);
 
-void* parse_if(Parser* parser);
+void *parse_if(Parser *parser);
+
 /**
  * 异常处理
  * @param parser 指针
@@ -87,7 +97,7 @@ void* parse_if(Parser* parser);
  */
 void *parse_try(Parser *parser);
 
-void* parse_switch(Parser *parser);
+void *parse_switch(Parser *parser);
 
 /**
  * {}代码块儿解析

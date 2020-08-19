@@ -25,8 +25,6 @@
 #define STR2(s) #s
 #define STR(s) STR2(s)
 
-#define error(...) log_error(__FILE__ ":" STR(__LINE__), 1, 1, __VA_ARGS__)
-#define errort(file, token, ...) log_error(file, token->row_pos, token->col_pos, __VA_ARGS__)
 #define MALLOC_SIZE(t, size) sizeof(t) size
 
 #define try(buff) if(!setjmp(buff))
@@ -34,17 +32,15 @@
 #define throw(buff, v) longjmp(buff,v);
 #endif
 
-
 typedef struct str_buff_ {
     unsigned int len;
     unsigned int buff_size;
     char *body;
 } StringBuff;
 
-
-void log_error(char *file, unsigned int line, unsigned int pos, char *fmt, ...);
-
 char *get_token_pos(Token *token);
+
+
 
 unsigned long hash(void *key);
 
@@ -75,6 +71,11 @@ char *to_string(StringBuff *buff);
 void print_buff(StringBuff *buff);
 
 void clear_buff(StringBuff *buff);
+
+/**
+ * 回收 malloc
+ */
+void recycle_buff(StringBuff* buff);
 
 /**
  * int 类型转 字符类型

@@ -92,3 +92,12 @@ char buff_get(StringBuff* buff, int index){
         return buff->body[index];
     return '\0';
 }
+
+
+
+void recycle_buff(StringBuff* buff){
+    if (buff != NULL){
+        free(buff->body);
+        free(buff);
+    }
+}

@@ -7,7 +7,7 @@
 #include "stdlib.h"
 
 void *binary_eval(Environment *env, BinaryExpr *expr) {
-    print("二元运算: %s", __FUNCTION__);
+
     GET_EVAL(expr->left)->eval(env, expr->left);
     GET_EVAL(expr->right)->eval(env, expr->right);
 
@@ -30,7 +30,7 @@ void *var_eval(Environment *env, VarTerm *term) {
 }
 
 void *constant_eval(Environment *env, ConstantTerm *term) {
-    print("常量: %s", __FUNCTION__);
+
     switch (term->name->kind) {
         case NUMBER:
             return "number";
@@ -39,13 +39,13 @@ void *constant_eval(Environment *env, ConstantTerm *term) {
         case ID:
             return term->name->text;
         default:
-            error("失败");
+            return NULL;
     }
     return NULL;
 }
 
 void *block_eval(Environment *env, BlockStmt *stmt) {
-    print("代码块: %s", __FUNCTION__);
+
     List *comm = stmt->stmts;
     void *node;
     for (int i = 0; i < comm->size; ++i) {
@@ -57,18 +57,18 @@ void *block_eval(Environment *env, BlockStmt *stmt) {
 }
 
 void *start_eval(Environment *env, StartTerm *stmt) {
-    print("前缀表达式: %s", __FUNCTION__);
+
     return NULL;
 }
 
 void *end_eval(Environment *env, EndTerm *stmt) {
-    print("后缀表达式: %s", __FUNCTION__);
+
     return NULL;
 }
 
 
 void *call_eval(Environment *env, CallTerm *term) {
-    print("函数调用: %s", __FUNCTION__);
+
     ConstantTerm *constant = term->expr;
     List *args = term->args;
     char buff[1024];
@@ -76,7 +76,7 @@ void *call_eval(Environment *env, CallTerm *term) {
 }
 
 void *fun_eval(Environment *env, FunStmt *fun) {
-    print("方法声明: %s", __FUNCTION__);
+
     return NULL;
 }
 
@@ -92,12 +92,12 @@ void *tree_eval(Environment *env, Tree *eval) {
 }
 
 void *try_eval(Environment *env, TryStmt *stmt) {
-    print("异常捕获: %s", __FUNCTION__);
+
     return NULL;
 }
 
 void *catch_eval(Environment *env, CatchStmt *stmt) {
-    print("call: %s", __FUNCTION__);
+
     return NULL;
 }
 
@@ -112,7 +112,7 @@ Eval *new_eval(void *(*eval_call)(Environment *env, void *node)) {
 }
 
 void *class_eval(Environment *env, ClassStmt *stmt) {
-    print("类定义: %s", __FUNCTION__);
+
     return NULL;
 }
 

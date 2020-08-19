@@ -6,21 +6,21 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-unsigned long hash(void* key){
-    return key? (unsigned long )key : 0;
+unsigned long hash(void *key) {
+    return key ? (unsigned long) key : 0;
 }
 
-unsigned int hash_fun(void* key, unsigned int m){
+unsigned int hash_fun(void *key, unsigned int m) {
     return hash(key) % m;
 }
 
-List * map_get_(Map* map, void* key){
+List *map_get_(Map *map, void *key) {
     unsigned int pos = hash_fun(key, map->prime);
     return map->elem[pos];
 }
 
-Elem* new_elem(void* key, void* value){
-    Elem* elem = malloc(sizeof(Elem));
+Elem *new_elem(void *key, void *value) {
+    Elem *elem = malloc(sizeof(Elem));
     elem->key = key;
     elem->value = value;
     return elem;
@@ -31,7 +31,7 @@ Elem* new_elem(void* key, void* value){
  * @param number >= 2
  * @return < 2 返回 2 否则返回最大的质数
  */
-unsigned int get_prime(unsigned int number){
+unsigned int get_prime(unsigned int number) {
     for (unsigned int i = number; i >= 2; --i) {
         for (int j = 2; j < i; ++j) {
             if (i % j == 0)
@@ -43,8 +43,8 @@ unsigned int get_prime(unsigned int number){
     return 2;
 }
 
-Map* new_map(unsigned int size){
-    Map* map = malloc(sizeof(Map));
+Map *new_map(unsigned int size) {
+    Map *map = malloc(sizeof(Map));
     map->size = 0;
     map->capacity = size ? size : 11;
     map->elem = malloc(sizeof(List) * map->capacity);
@@ -52,17 +52,17 @@ Map* new_map(unsigned int size){
     return map;
 }
 
-void map_put(Map* map, void* key, void* value){
+void map_put(Map *map, void *key, void *value) {
     unsigned int pos = hash_fun(key, map->prime);
-    if (map->elem[pos] == NULL){
+    if (map->elem[pos] == NULL) {
         map->elem[pos] = new_list();
     }
-    List * els = map_get_(map, key);
-    Elem* elem;
-    Node* node = els->head;
-    while (node != NULL){
+    List *els = map_get_(map, key);
+    Elem *elem;
+    Node *node = els->head;
+    while (node != NULL) {
         elem = node->data;
-        if (hash(key) == hash(elem->key)){
+        if (hash(key) == hash(elem->key)) {
             elem->value = value;
             return;
         }
@@ -72,14 +72,14 @@ void map_put(Map* map, void* key, void* value){
     map->size++;
 }
 
-void* map_get(Map* map, void* key){
-    List * els = map_get_(map, key);
+void *map_get(Map *map, void *key) {
+    List *els = map_get_(map, key);
     if (els == NULL)return NULL;
-    Elem* elem;
-    Node* node = els->head;
-    while (node != NULL){
+    Elem *elem;
+    Node *node = els->head;
+    while (node != NULL) {
         elem = node->data;
-        if (hash(key) == hash(elem->key)){
+        if (hash(key) == hash(elem->key)) {
             return elem->value;
         }
         node = node->next;
@@ -87,19 +87,19 @@ void* map_get(Map* map, void* key){
     return NULL;
 }
 
-void* map_remove(Map* map, void* key){
-    List *els = map_get_(map,key);
+void *map_remove(Map *map, void *key) {
+    List *els = map_get_(map, key);
     if (els == NULL)return NULL;
-    Elem* elem;
+    Elem *elem;
     for (int i = 0; i < els->size; ++i) {
-        elem = list_get(els,i);
+        elem = list_get(els, i);
         if (elem == NULL)return NULL;
-        if (hash(elem->key) == hash(key)){
-            list_remove(els,i);
+        if (hash(elem->key) == hash(key)) {
+            list_remove(els, i);
             break;
         }
     }
-    void* value = elem->value;
+    void *value = elem->value;
     free(elem);
     map->size--;
     return value;
