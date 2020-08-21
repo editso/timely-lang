@@ -9,8 +9,8 @@ void buff_zero(char* buff, unsigned int size){
 }
 
 
-StringBuff* new_sbuff(int size){
-    StringBuff* buff = malloc(sizeof(StringBuff));
+CharBuff* new_buff(unsigned int size){
+    CharBuff* buff = malloc(sizeof(CharBuff));
     size =  MALLOC_SIZE(char, +size);
     buff->body = malloc(MALLOC_SIZE(char, +size));
     buff_zero(buff->body, size);
@@ -33,7 +33,7 @@ unsigned long str_len_(const char* s){
  * @param new_size 新的buff大小
  * @return 成功 1 否则 -1
  */
-int re_sbuff(StringBuff* buff, unsigned int new_size){
+int re_sbuff(CharBuff* buff, unsigned int new_size){
     if (new_size <= buff->buff_size){
         new_size = buff->buff_size * 2;
     }
@@ -49,7 +49,7 @@ int re_sbuff(StringBuff* buff, unsigned int new_size){
 }
 
 
-int sbuff_write(StringBuff* buff, char c){
+int sbuff_write(CharBuff* buff, char c){
     if (buff->len >= buff->buff_size){
         if (re_sbuff(buff, buff->buff_size * 2) == 0)return t_false;
     }
@@ -57,11 +57,11 @@ int sbuff_write(StringBuff* buff, char c){
     return t_true;
 }
 
-int append_chr(StringBuff* buff, char c){
+int append_chr(CharBuff* buff, char c){
     return sbuff_write(buff, c);
 }
 
-int append_str(StringBuff* buff, char *c){
+int append_str(CharBuff* buff, char *c){
     unsigned long len = str_len_(c);
     for (int i = 0; i < len; ++i) {
         if (sbuff_write(buff, c[i])  == 0)return t_false;
@@ -69,17 +69,17 @@ int append_str(StringBuff* buff, char *c){
     return t_true;
 }
 
-char* to_string(StringBuff* buff){
+char* to_string(CharBuff* buff){
     char* s = malloc(MALLOC_SIZE(char,  +buff->len));
     buff_zero(s, buff->len);
     return strcpy(s, buff->body);
 }
 
-void print_buff(StringBuff* buff){
+void print_buff(CharBuff* buff){
     printf("%s\n",  buff->body);
 }
 
-void clear_buff(StringBuff* buff){
+void clear_buff(CharBuff* buff){
     void* old = buff->body;
     buff->body = malloc(sizeof(char) * buff->len * 2);
     free(old);
@@ -87,7 +87,7 @@ void clear_buff(StringBuff* buff){
     buff->len = 0;
 }
 
-char buff_get(StringBuff* buff, int index){
+char buff_get(CharBuff* buff, int index){
     if (buff->len > index)
         return buff->body[index];
     return '\0';
@@ -95,7 +95,7 @@ char buff_get(StringBuff* buff, int index){
 
 
 
-void recycle_buff(StringBuff* buff){
+void recycle_buff(CharBuff* buff){
     if (buff != NULL){
         free(buff->body);
         free(buff);

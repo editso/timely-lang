@@ -260,7 +260,7 @@ void *parse_variable(Parser *parser, Modifier *modifier) {
 //                        && token(parser)->kind != END){
 //                    out_token(token(parser));
 //                    fprintf(stderr,"%s: Variable type is ambiguous: %s",
-//                            get_token_pos(name),
+//                            token_pos(name),
 //                            get_kind_meta(name->kind).name);
 //                    exit(1);
 //                }
@@ -306,8 +306,8 @@ void *parse_if(Parser *parser) {
     while (token(parser)->kind == ELSE) {
         if (elsexpr != NULL) {
             parse_error(parser, "%s: Invalid statement: %s",
-                      get_token_pos(token(parser)),
-                      get_kind_meta(token(parser)->kind).name);
+                        token_pos(token(parser)),
+                        get_kind_meta(token(parser)->kind).name);
         }
         move(parser);
         if (token(parser)->kind == IF) {

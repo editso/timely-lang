@@ -7,7 +7,7 @@
 
 
 KindMeta get_kind_meta(Kind kind) {
-    StringBuff *buff = new_sbuff(2);
+    CharBuff *buff = new_buff(2);
     if (kind != NEWLINE && kind >= 0 && kind <= 127) {
         KindMeta *meta = malloc(sizeof(KindMeta));
         append_chr(buff, (char) kind);
@@ -39,14 +39,14 @@ void print_error(char *label, char *line, char *pos, char *fmt, va_list arg) {
 void log_code(char *file, int row, int col, char *message, ...) {
     va_list args;
     va_start(args,message);
-    StringBuff *buff = new_sbuff(100);
+    CharBuff *buff = new_buff(100);
     append_str(buff, file);
     append_str(buff, ":");
     append_str(buff, itochr(row));
     append_chr(buff, ':');
     append_str(buff, itochr(col));
     append_chr(buff, ':');
-    append_str(buff,TAG_ERROR);
+    append_str(buff, TAG_ERROR);
     append_str(buff, message);
     log_log(LOG_LEVEL_ERROR, stderr, to_string(buff), args);
     va_end(args);
@@ -55,8 +55,8 @@ void log_code(char *file, int row, int col, char *message, ...) {
 }
 
 
-char *get_token_pos(Token *token) {
-    StringBuff *buff = new_sbuff(4);
+char *token_pos(Token *token) {
+    CharBuff *buff = new_buff(4);
     append_chr(buff, '(');
     append_str(buff, itochr((int) token->row_pos));
     append_chr(buff, ',');
@@ -122,7 +122,7 @@ void log_log(unsigned int l, FILE *file, char* message, va_list list){
 void log_error(char* message, ...){
     va_list list;
     va_start(list,message);
-    StringBuff* buff = new_sbuff(1024);
+    CharBuff* buff = new_buff(1024);
     append_str(buff, TAG_ERROR);
     append_str(buff, message);
     log_log(LOG_LEVEL_ERROR, stderr,to_string(buff), list);
@@ -135,7 +135,7 @@ void log_error(char* message, ...){
 void log_warning(char* message, ...){
     va_list list;
     va_start(list,message);
-    StringBuff* buff = new_sbuff(1024);
+    CharBuff* buff = new_buff(1024);
     append_str(buff, TAG_WARNING);
     append_str(buff, message);
     log_log(LOG_LEVEL_WARNING, stdout, to_string(buff), list);
@@ -146,7 +146,7 @@ void log_warning(char* message, ...){
 void log_info(char* message, ...){
     va_list list;
     va_start(list,message);
-    StringBuff* buff = new_sbuff(1024);
+    CharBuff* buff = new_buff(1024);
     append_str(buff, TAG_INFO);
     append_str(buff, message);
     log_log(LOG_LEVEL_INFO, stdout, to_string(buff), list);
@@ -157,7 +157,7 @@ void log_info(char* message, ...){
 void log_debug(char *message, ...){
     va_list list;
     va_start(list,message);
-    StringBuff* buff = new_sbuff(1024);
+    CharBuff* buff = new_buff(1024);
     append_str(buff, TAG_DEBUG);
     append_str(buff, message);
     log_log(LOG_LEVEL_DEBUG, stdout, to_string(buff), list);
@@ -180,7 +180,7 @@ char *reverse(char *s) {
 char *itochr(int i) {
     int num = abs(i);
     if (num == 0) return "0";
-    StringBuff *buff = new_sbuff(10);
+    CharBuff *buff = new_buff(10);
     int n;
     while (num > 0) {
         n = num % 10;

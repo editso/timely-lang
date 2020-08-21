@@ -75,7 +75,7 @@ Token *new_end_token() {
     return token;
 }
 
-char *read_letter(Lexer *lexer, StringBuff* buff) {
+char *read_letter(Lexer *lexer, CharBuff* buff) {
     int chr;
     while ((chr = read_chr(lexer)) != END) {
         // a_9 | a$9
@@ -89,7 +89,7 @@ char *read_letter(Lexer *lexer, StringBuff* buff) {
     return to_string(buff);;
 }
 
-char *read_digit(Lexer *lexer, StringBuff* buff) {
+char *read_digit(Lexer *lexer, CharBuff* buff) {
     int chr;
     t_bool dot = t_false;
     while ((chr = read_chr(lexer)) != END) {
@@ -115,7 +115,7 @@ char *read_digit(Lexer *lexer, StringBuff* buff) {
     return to_string(buff);
 }
 
-char *read_string(Lexer *lexer,StringBuff* buff) {
+char *read_string(Lexer *lexer, CharBuff* buff) {
     int chr;
     int flag = 0;
     while ((chr = read_chr(lexer)) != END) {
@@ -141,7 +141,7 @@ char *read_string(Lexer *lexer,StringBuff* buff) {
 /**
  * 多行注释
  */
-char *read_multi_note(Lexer *lexer,StringBuff* buff) {
+char *read_multi_note(Lexer *lexer, CharBuff* buff) {
     int chr;
     int op;
     while ((chr = read_chr(lexer))) {
@@ -174,7 +174,7 @@ char *read_multi_note(Lexer *lexer,StringBuff* buff) {
 /**
  * 单行
  */
-char *read_single_note(Lexer *lexer, StringBuff* buff) {
+char *read_single_note(Lexer *lexer, CharBuff* buff) {
     int chr;
     while ((chr = read_chr(lexer))) {
         if (is_new_line(chr) || chr == END) {
@@ -190,7 +190,7 @@ char *read_single_note(Lexer *lexer, StringBuff* buff) {
 /**
  * 运算符
  */
-Token *read_operator(Lexer* lexer, StringBuff* buff){
+Token *read_operator(Lexer* lexer, CharBuff* buff){
     int chr = read_chr(lexer);
     int op = read_chr(lexer);
     /**
@@ -231,7 +231,7 @@ Token *read_operator(Lexer* lexer, StringBuff* buff){
     return new_token(lexer, EMPTY,to_string(buff));
 }
 
-Token* select_token(Lexer* lexer, int chr, StringBuff* buff){
+Token* select_token(Lexer* lexer, int chr, CharBuff* buff){
     switch (chr) {
         case ' ':
             break;
@@ -290,7 +290,7 @@ Token* select_token(Lexer* lexer, int chr, StringBuff* buff){
 
 void read_all(Lexer *lexer) {
     int chr;
-    StringBuff *buff = new_sbuff(10);
+    CharBuff *buff = new_buff(10);
     Token* token;
     while ((chr = read_chr(lexer)) != END) {
         if (is_new_line(chr)) {

@@ -33,6 +33,23 @@ void list_add(List * list, void *data){
     list_insert(list, list->size, data);
 }
 
+
+Node* list_get_(List * list, unsigned int index){
+    if (index >= list->size || index < 0){
+        return NULL;
+    }
+    int tmp = 0;
+    Node *curNode = list->head;
+    while (curNode != NULL){
+        if (tmp == index){
+            return curNode;
+        }
+        tmp++;
+        curNode = curNode->next;
+    }
+    return NULL;
+}
+
 /**
  * 向list指定位置插入一个元素
  * @param list 指向list的指针
@@ -64,7 +81,7 @@ int list_insert(List * list, unsigned int index, void *data){
             list->head = new;
         }
     }else{
-        Node* node = list_get(list, index);
+        Node* node = list_get_(list, index);
         if (node != NULL){
             /**
              * 直接插入到指定位置
@@ -95,21 +112,6 @@ int list_insert(List * list, unsigned int index, void *data){
 }
 
 
-Node* list_get_(List * list, unsigned int index){
-    if (index >= list->size || index < 0){
-        return NULL;
-    }
-    int tmp = 0;
-    Node *curNode = list->head;
-    while (curNode != NULL){
-        if (tmp == index){
-            return curNode;
-        }
-        tmp++;
-        curNode = curNode->next;
-    }
-    return NULL;
-}
 
 /**
  * 获取指定位置的元素
