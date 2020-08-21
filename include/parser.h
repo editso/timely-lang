@@ -28,7 +28,7 @@ __VA_ARGS__)
 
 typedef struct parser_ {
     Lexer *lexer;
-    Tree *root;
+    Tree *tree;
     Token *token;
     Stack *stack;
 } Parser;

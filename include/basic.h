@@ -32,52 +32,14 @@
 #define throw(buff, v) longjmp(buff,v);
 #endif
 
-typedef struct str_buff_ {
-    unsigned int len;
-    unsigned int buff_size;
-    char *body;
-} CharBuff;
 
 char *token_pos(Token *token);
 
 unsigned long hash(void *key);
 
-void print(char *, ...);
-
-
 void out_token(Token *token);
 
 long to_number(List *list);
 
-/**
- * buff.c
- */
-
-char *reverse(char *s);
-
-CharBuff *new_buff(unsigned int size);
-
-int append_str(CharBuff *buff, char *c);
-
-int append_chr(CharBuff *buff, char c);
-
-char buff_get(CharBuff* buff, int index);
-
-char *to_string(CharBuff *buff);
-
-void print_buff(CharBuff *buff);
-
-void clear_buff(CharBuff *buff);
-
-/**
- * 回收 malloc
- */
-void recycle_buff(CharBuff* buff);
-
-/**
- * int 类型转 字符类型
- * @return 转换好的
- */
-char *itochr(int i);
 
 #endif //TIMELY_LANG_BASIC_H

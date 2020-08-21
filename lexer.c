@@ -8,6 +8,7 @@
 #include "include/lexer.h"
 #include "include/list.h"
 #include "include/basic.h"
+#include "include/tstring.h"
 
 char c_buf_[1];
 

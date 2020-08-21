@@ -1,13 +1,13 @@
 //
 // Created by zy on 8/13/20.
 //
+#include "include/tstring.h"
 #include "include/basic.h"
 
 
 void buff_zero(char* buff, unsigned int size){
     memset(buff, '\0', size);
 }
-
 
 CharBuff* new_buff(unsigned int size){
     CharBuff* buff = malloc(sizeof(CharBuff));
@@ -93,11 +93,40 @@ char buff_get(CharBuff* buff, int index){
     return '\0';
 }
 
-
-
 void recycle_buff(CharBuff* buff){
     if (buff != NULL){
         free(buff->body);
         free(buff);
     }
+}
+
+
+char *itochr(int i) {
+    int num = abs(i);
+    if (num == 0) return "0";
+    CharBuff *buff = new_buff(10);
+    int n;
+    while (num > 0) {
+        n = num % 10;
+        append_chr(buff, (char) (n + '0'));
+        num /= 10;
+    }
+    if (i < 0) {
+        append_chr(buff, '-');
+    }
+    char *value = to_string(buff);
+    free(buff->body);
+    free(buff);
+    return reverse(value);
+}
+
+char *reverse(char *s) {
+    unsigned long len = strlen(s);
+    char chr;
+    for (unsigned int i = len - 1, j = 0; j < i; --i, j++) {
+        chr = s[j];
+        s[j] = s[i];
+        s[i] = chr;
+    }
+    return s;
 }

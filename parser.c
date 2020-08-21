@@ -77,7 +77,7 @@ t_bool is_operator(Token *token) {
 Parser *new_parser(Lexer *lexer) {
     Parser *parser = malloc(sizeof(Parser));
     parser->lexer = lexer;
-    parser->root = new_tree(new_list());
+    parser->tree = new_tree(new_list());
     parser->stack = new_stack();
     return parser;
 }
@@ -85,10 +85,10 @@ Parser *new_parser(Lexer *lexer) {
 Tree *parse(Parser *parser) {
     move(parser);
     while (token(parser)->kind != END) {
-        list_add(parser->root->stmts, parse_stmt(parser));
+        list_add(parser->tree->stmts, parse_stmt(parser));
         move(parser);
     }
-    return parser->root;
+    return parser->tree;
 }
 
 

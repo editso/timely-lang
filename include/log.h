@@ -25,7 +25,7 @@
 #define LOG_LEVEL_WARNING  LOG_LEVEL_INFO | 2u
 #define LOG_LEVEL_ERROR  LOG_LEVEL_WARNING | 4u
 #define LOG_LEVEL_DEBUG LOG_LEVEL_ERROR | 8u
-#define LOG_CLOSE 0u
+#define LOG_DISABLE 0u
 
 #define level log_level_
 #define is_level(l) (level & l) == l

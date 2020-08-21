@@ -33,7 +33,6 @@ void list_add(List * list, void *data){
     list_insert(list, list->size, data);
 }
 
-
 Node* list_get_(List * list, unsigned int index){
     if (index >= list->size || index < 0){
         return NULL;
@@ -169,6 +168,7 @@ char* list_to_string(List * list){
     }
     return s;
 }
+
 
 
 #endif //TIMELY_LANG_LIST_C_H

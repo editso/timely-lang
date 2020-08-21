@@ -207,6 +207,4 @@ KindMeta find_kind(char *kind);
 
 KindMeta get_kind_meta(Kind kind);
 
-
-
 #endif //TIMELY_LANG_TOKEN_H

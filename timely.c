@@ -18,14 +18,12 @@ int main(int argc, char **argv) {
     signal(SIGABRT, handler);
     signal(SIGFPE, handler);
     level = LOG_LEVEL_ERROR;
-
-    print("%s", big_add("0","1"));
-//    try(buf) {
-//        Lexer *lexer = new_lexer(argv[1]);
-//        Parser *parser = new_parser(lexer);
-//        GET_EVAL(parse(parser))->eval(NULL, parser->root);
-//    } catch(4) {
-//        log_error("遇到错误!!");
-//    }
+    try(buf) {
+        Lexer *lexer = new_lexer(argv[1]);
+        Parser *parser = new_parser(lexer);
+        GET_EVAL(parse(parser))->eval(NULL, parser->tree);
+    } catch(4) {
+        log_error("遇到错误!!");
+    }
     return 0;
 }

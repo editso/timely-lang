@@ -2,6 +2,7 @@
 // Created by zy on 2020/8/21.
 //
 #include "include/basic.h"
+#include "include/tstring.h"
 #include "include/list.h"
 #include "include/tmath.h"
 #include <string.h>
