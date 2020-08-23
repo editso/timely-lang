@@ -1,10 +1,6 @@
 //
 // Created by zy on 8/7/20.
 //
-
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include "include/lexer.h"
 #include "include/list.h"
 #include "include/basic.h"
@@ -324,13 +320,13 @@ t_bool fill_list(Lexer *lexer, int index) {
 }
 
 Lexer *new_lexer(char *file) {
-    struct lexer *lexer = malloc(sizeof(struct lexer));
+    struct lexer *lexer = new(Lexer);
     if ((lexer->file = fopen(file, "r")) == NULL) {
         perror("timely");
         exit(0);
     }
     lexer->source = file;
-    lexer->tokens = malloc(sizeof(List));
+    lexer->tokens = new_list();
     lexer->last_chr = EMPTY;
     lexer->row_pos = 1;
     lexer->col_pos = 1;

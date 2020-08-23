@@ -36,7 +36,7 @@ public class Main:A,B{
         try{
 
         }catch e:Exception{
-            e.printf()
+            
         }finally{
 
         }
@@ -56,7 +56,7 @@ public class Main:A,B{
 
     //  函数重载, 默认返回类型隐式转换
     public fun print(a:int,b:int,a:int){
-        this.print()
+        
     }
 }
 ```

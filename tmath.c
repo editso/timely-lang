@@ -25,10 +25,10 @@ char *big_add(char *a, char *b) {
     unsigned int min = blen <= alen ? blen : alen;
     char *mb = blen <= alen ? b : a;
     for (int i = 0; i < max; ++i) {
-        list_add(al, GET_CHAR(ma[i]));
+        list_add(al, new_char(ma[i]));
     }
     for (int i = 0; i < min; ++i) {
-        list_add(bl, GET_CHAR(mb[i]));
+        list_add(bl, new_char(mb[i]));
     }
     int ia,ib,x;
     for (int i = (int) al->size - 1, j = (int) bl->size - 1; j >= 0; --i, --j) {
@@ -43,7 +43,7 @@ char *big_add(char *a, char *b) {
         }
         // 进位
         if (x < 0) {
-            list_insert(al, 0, GET_CHAR((ia + ib) / 10 + '0'));
+            list_insert(al, 0, new_char((ia + ib) / 10 + '0'));
         } else {
             *(char *) list_get(al, x) = (char) (ia + ib + '0');
         }

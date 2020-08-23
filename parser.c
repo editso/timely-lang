@@ -75,7 +75,7 @@ t_bool is_operator(Token *token) {
 }
 
 Parser *new_parser(Lexer *lexer) {
-    Parser *parser = malloc(sizeof(Parser));
+    Parser *parser = new(Parser);
     parser->lexer = lexer;
     parser->tree = new_tree(new_list());
     parser->stack = new_stack();

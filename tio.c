@@ -10,3 +10,4 @@ void print(char *s, ...) {
     printf("\n");
     va_end(args);
 }
+

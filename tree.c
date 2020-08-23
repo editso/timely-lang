@@ -2,9 +2,8 @@
 // Created by zy on 8/9/20.
 //
 #include "include/eval.h"
+#include "include/tio.h"
 #include "include/basic.h"
-#include "string.h"
-#include "stdlib.h"
 
 void *binary_eval(Environment *env, BinaryExpr *expr) {
 
@@ -106,7 +105,7 @@ void *empty_eval(Environment *env, EmptyStmt *term) {
 }
 
 Eval *new_eval(void *(*eval_call)(Environment *env, void *node)) {
-    Eval *eval = malloc(sizeof(Eval));
+    Eval *eval = new(Eval);
     eval->eval = eval_call;
     return eval;
 }
@@ -117,14 +116,14 @@ void *class_eval(Environment *env, ClassStmt *stmt) {
 }
 
 Tree *new_tree(List *list) {
-    Tree *tree = malloc(sizeof(Tree));
+    Tree *tree = new(Tree);
     tree->stmts = list;
     tree->eval = *new_eval(GET_FUN(tree_eval));
     return tree;
 }
 
 VarTerm *new_var_term(Token *name, void *expr, Type* type, Modifier* modifier) {
-    VarTerm *var = malloc(sizeof(VarTerm));
+    VarTerm *var = new(VarTerm);
     var->eval = *new_eval(GET_FUN(var_eval));
     var->name = name;
     var->value = expr;
@@ -134,14 +133,14 @@ VarTerm *new_var_term(Token *name, void *expr, Type* type, Modifier* modifier) {
 }
 
 ConstantTerm *new_constant_term(Token *name) {
-    ConstantTerm *constraint = malloc(sizeof(ConstantTerm));
+    ConstantTerm *constraint = new(ConstantTerm);
     constraint->name = name;
     constraint->eval = *new_eval(GET_FUN(constant_eval));
     return constraint;
 }
 
 BinaryExpr *new_binary_expr(void *left, Token *op, void *right) {
-    BinaryExpr *binary = malloc(sizeof(BinaryExpr));
+    BinaryExpr *binary = new(BinaryExpr);
     binary->left = left;
     binary->op = op;
     binary->right = right;
@@ -150,14 +149,14 @@ BinaryExpr *new_binary_expr(void *left, Token *op, void *right) {
 }
 
 BlockStmt *new_block_stmt(List *stmts) {
-    BlockStmt *block = malloc(sizeof(BlockStmt));
+    BlockStmt *block = new(BlockStmt);
     block->stmts = stmts;
     block->eval = *new_eval(GET_FUN(block_eval));
     return block;
 }
 
 WhileStmt *new_while_stmt(void *expr, void *block) {
-    WhileStmt *t_while = malloc(sizeof(WhileStmt));
+    WhileStmt *t_while = new(WhileStmt);
     t_while->expr = expr;
     t_while->block = block;
     t_while->eval = *new_eval(GET_FUN(while_eval));
@@ -165,7 +164,7 @@ WhileStmt *new_while_stmt(void *expr, void *block) {
 }
 
 StartTerm *new_start_term(Token *op, void *expr) {
-    StartTerm *term = malloc(sizeof(StartTerm));
+    StartTerm *term = new(StartTerm);
     term->eval = *new_eval(GET_FUN(start_eval));
     term->op = op;
     term->expr = expr;
@@ -173,7 +172,7 @@ StartTerm *new_start_term(Token *op, void *expr) {
 }
 
 EndTerm *new_end_term(Token *op, void *expr) {
-    EndTerm *term = malloc(sizeof(EndTerm));
+    EndTerm *term = new(EndTerm);
     term->eval = *new_eval(GET_FUN(end_eval));
     term->op = op;
     term->expr = expr;
@@ -181,7 +180,7 @@ EndTerm *new_end_term(Token *op, void *expr) {
 }
 
 CallTerm *new_call_term(void *expr, List *args) {
-    CallTerm *term = malloc(sizeof(CallTerm));
+    CallTerm *term = new(CallTerm);
     term->expr = expr;
     term->eval = *new_eval(GET_FUN(call_eval));
     term->args = args;
@@ -189,14 +188,14 @@ CallTerm *new_call_term(void *expr, List *args) {
 }
 
 EmptyStmt *new_empty(Token *op) {
-    EmptyStmt *empty = malloc(sizeof(EmptyStmt));
+    EmptyStmt *empty = new(EmptyStmt);
     empty->token = op;
     empty->eval = *new_eval(GET_FUN(empty_eval));
     return empty;
 }
 
 FunStmt *new_fun_stmt(Token *name, List *args, void *block, Modifier* modifier) {
-    FunStmt *fun = malloc(sizeof(FunStmt));
+    FunStmt *fun = new(FunStmt);
     fun->eval = *new_eval(GET_FUN(fun_eval));
     fun->name = name;
     fun->args = args;
@@ -206,7 +205,7 @@ FunStmt *new_fun_stmt(Token *name, List *args, void *block, Modifier* modifier) 
 }
 
 TryStmt *new_try_stmt(void *block, List *stmts, void *finally) {
-    TryStmt *stmt = malloc(sizeof(TryStmt));
+    TryStmt *stmt = new(TryStmt);
     stmt->eval = *new_eval(GET_FUN(try_eval));
     stmt->block = block;
     stmt->stmts = stmts;
@@ -215,7 +214,7 @@ TryStmt *new_try_stmt(void *block, List *stmts, void *finally) {
 }
 
 CatchStmt *new_catch_stmt(void *expr, void *block) {
-    CatchStmt *stmt = malloc(sizeof(CatchStmt));
+    CatchStmt *stmt = new(CatchStmt);
     stmt->eval = *new_eval(GET_FUN(catch_eval));
     stmt->expr = expr;
     stmt->block = block;
@@ -223,7 +222,7 @@ CatchStmt *new_catch_stmt(void *expr, void *block) {
 }
 
 ClassStmt *new_class_stmt(Token *name, List *extends, void *block, Modifier* modifier) {
-    ClassStmt *stmt = malloc(sizeof(ClassStmt *));
+    ClassStmt *stmt = new(ClassStmt);
     stmt->eval = *new_eval(GET_FUN(class_eval));
     stmt->name = name;
     stmt->extends = extends;
@@ -233,46 +232,46 @@ ClassStmt *new_class_stmt(Token *name, List *extends, void *block, Modifier* mod
 }
 
 Modifier* new_modifier(List* modifiers){
-    Modifier* modifier = malloc(sizeof(Modifier));
+    Modifier* modifier = new(Modifier);
     modifier->modifiers = modifiers;
     return modifier;
 }
 
 Stmt* new_stmt(List* stmt){
-    Stmt* stmts = malloc(sizeof(Stmt));
+    Stmt* stmts = new(Stmt);
     stmts->stmt = stmt;
     return stmts;
 }
 
 Type* new_type(Token* name){
-    Type* type = malloc(sizeof(Type));
+    Type* type = new(Type);
     type->name = name;
     return type;
 }
 
 ArraySubscript*  new_array_subscript(void* name, void* expr){
-    ArraySubscript* arraySubscript  = malloc(sizeof(ArraySubscript));
+    ArraySubscript* arraySubscript  = new(ArraySubscript);
     arraySubscript->name = name;
     arraySubscript->expr = expr;
     return arraySubscript;
 }
 
 Expr* new_expr(void* expr){
-    Expr* expr_ = malloc(sizeof(Expr));
+    Expr* expr_ = new(Expr);
     expr_->expr = expr;
     return expr_;
 }
 
 
 SelectMember* new_select_member( void* object, void* expr){
-    SelectMember* member = malloc(sizeof(SelectMember));
+    SelectMember* member = new(SelectMember);
     member->expr = expr;
     member->object = object;
     return member;
 }
 
 IFStmt* new_if_stmt(void* expr, void* block, List* elseif, void*  elsexpr){
-    IFStmt* stmt = malloc(sizeof(IFStmt));
+    IFStmt* stmt = new(IFStmt);
     stmt->expr = expr;
     stmt->block = block;
     stmt->elsexpr = elsexpr;
@@ -281,7 +280,7 @@ IFStmt* new_if_stmt(void* expr, void* block, List* elseif, void*  elsexpr){
 }
 
 SwitchStmt* new_switch_stmt(void* expr, List* cases, void* defexpr){
-    SwitchStmt* stmt = malloc(sizeof(SwitchStmt));
+    SwitchStmt* stmt = new(SwitchStmt);
     stmt->expr = expr;
     stmt->cases = cases;
     stmt->defexpr = defexpr;
@@ -289,7 +288,7 @@ SwitchStmt* new_switch_stmt(void* expr, List* cases, void* defexpr){
 }
 
 CaseStmt* new_case_stmt(void* expr, void* block){
-    CaseStmt* stmt = malloc(sizeof(CaseStmt));
+    CaseStmt* stmt = new(CaseStmt);
     stmt->block = block;
     stmt->expr = expr;
     return stmt;
