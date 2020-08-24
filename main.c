@@ -14,7 +14,7 @@ void handler(int sig) {
 }
 
 int main(int argc, char **argv) {
-    level = LOG_LEVEL_ERROR;
+    level = LOG_LEVEL_DEBUG;
     signal(SIGSEGV, handler);
     signal(SIGABRT, handler);
     signal(SIGFPE, handler);
@@ -22,11 +22,7 @@ int main(int argc, char **argv) {
     try(buf) {
         Lexer *lexer = new_lexer(argv[1]);
         Parser *parser = new_parser(lexer);
-        GET_EVAL(parse(parser))->eval(NULL, parser->tree);
-        log_debug("debug");
-        log_info("info");
-        log_warning("warning");
-        log_error("err");
+        to_eval(parse(parser))->eval(NULL, parser->tree);
     } catch(4) {
         log_error("遇到错误!!");
     }

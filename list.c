@@ -153,6 +153,10 @@ void* list_remove(List * list, unsigned int index){
     list->size --;
     void* data = node->data;
     free(node);
+    // 防止出现野指针
+    if (list->size == 0){
+        list->head = list->tail = NULL;
+    }
     return data;
 }
 

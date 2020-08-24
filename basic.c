@@ -7,7 +7,6 @@
 #include "include/tstring.h"
 #include "string.h"
 
-
 KindMeta get_kind_meta(Kind kind) {
     CharBuff *buff = new_buff(2);
     if (kind != NEWLINE && kind >= 0 && kind <= 127) {
@@ -90,5 +89,9 @@ void out_token(Token *token) {
           token->col_pos);
 }
 
-
+void* require_not_null(void* any, char *message){
+    if (any == NULL)
+        log_error("%s",message);
+    return any;
+}
 

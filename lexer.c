@@ -6,20 +6,20 @@
 #include "include/basic.h"
 #include "include/tstring.h"
 
-char c_buf_[1];
+char lexer_chr_buff_[1];
 
 int read_chr(struct lexer *lexer) {
     if (lexer->file == NULL) return END;
     if (lexer->last_chr == EMPTY) {
-        bzero(c_buf_, sizeof(c_buf_));
+        bzero(lexer_chr_buff_, sizeof(lexer_chr_buff_));
         lexer->col_pos++;
-        if (fread(c_buf_, sizeof(c_buf_), 1, lexer->file) <= 0) {
+        if (fread(lexer_chr_buff_, sizeof(lexer_chr_buff_), 1, lexer->file) <= 0) {
             fclose(lexer->file); // 关流
             lexer->also = t_false;
             lexer->file = NULL;
             return END;
         }
-        return *c_buf_;
+        return *lexer_chr_buff_;
     } else {
         int chr = lexer->last_chr;
         lexer->last_chr = EMPTY;
