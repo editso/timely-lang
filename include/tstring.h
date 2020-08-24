@@ -7,6 +7,8 @@
 #include "string.h"
 
 typedef struct str_buff_ {
+    // 初始 buff 大小
+    unsigned int init_size;
     unsigned int len;
     unsigned int buff_size;
     char *body;

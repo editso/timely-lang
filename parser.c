@@ -3,11 +3,21 @@
 //
 #include "include/parser.h"
 
+
 void move(Parser *parser) {
     if (stack_size(parser->stack) > 0) {
         parser->token = pop(parser);
     } else {
         parser->token = lexer_read(parser->lexer);
+    }
+}
+
+/**
+ * 跳过换行
+ */
+void break_newline(Parser* parser){
+    while (token(parser)->kind == NEWLINE){
+        move(parser);
     }
 }
 
@@ -85,7 +95,8 @@ Parser *new_parser(Lexer *lexer) {
 Tree *parse(Parser *parser) {
     move(parser);
     while (token(parser)->kind != END) {
-        list_add(parser->tree->stmts, parse_stmt(parser));
+        out_token(token(parser));
+//        list_add(parser->tree->stmts, parse_stmt(parser));
         move(parser);
     }
     return parser->tree;
@@ -130,7 +141,6 @@ void *parse_stmt(Parser *parser) {
             log_error("Illegal expression: %s",get_kind_meta(tok->kind).name);
     }
 }
-
 
 void *parse_modifier(Parser *parser) {
     Token *tok = token(parser);
@@ -281,6 +291,7 @@ void *parse_variable(Parser *parser, Modifier *modifier) {
 }
 
 void *parse_block(Parser *parser) {
+    break_newline(parser);
     expect(parser, OP_FL_BRA);
     List *stmts = new_list();
     while (token(parser)->kind != CL_FL_BRA) {
@@ -300,29 +311,19 @@ void *parse_if(Parser *parser) {
     expect(parser, OP_BRA);
     void *expr = parse_expr(parser);
     expect(parser, CL_BRA);
-    List *elseif = new_list();
-    void *elsexpr = NULL;
     void *block = parse_block(parser);
-    while (token(parser)->kind == ELSE) {
-        if (elsexpr != NULL) {
-            parse_error(parser, "%s: Invalid statement: %s",
-                        token_pos(token(parser)),
-                        get_kind_meta(token(parser)->kind).name);
-        }
-        move(parser);
-        if (token(parser)->kind == IF) {
-            move(parser);
-            expect(parser, OP_BRA);
-            void *exr = parse_expr(parser);
-            expect(parser, CL_BRA);
-            list_add(elseif, new_if_stmt(exr, parse_block(parser), NULL, NULL));
-        } else {
-            push(parser, token(parser));
-            expect(parser, OP_FL_BRA);
-            elsexpr = parse_block(parser);
-        }
+    void *else_expr  = NULL;
+    if (token(parser)->kind == ELSE)
+        else_expr =  parse_else(parser);
+    return new_if_stmt(expr, block, else_expr);
+}
+
+void *parse_else(Parser* parser){
+    expect(parser,ELSE);
+    if (token(parser)->kind == IF){
+        return new_else_stmt(parse_stmt(parser));
     }
-    return new_if_stmt(expr, block, elseif, elsexpr);
+    return new_else_stmt(parse_block(parser));
 }
 
 void *parse_while(Parser *parser) {

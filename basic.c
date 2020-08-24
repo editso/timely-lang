@@ -7,7 +7,6 @@
 #include "include/tstring.h"
 #include "string.h"
 
-
 KindMeta get_kind_meta(Kind kind) {
     CharBuff *buff = new_buff(2);
     if (kind != NEWLINE && kind >= 0 && kind <= 127) {
@@ -15,8 +14,7 @@ KindMeta get_kind_meta(Kind kind) {
         append_chr(buff, (char) kind);
         meta->kind = kind;
         meta->name = to_string(buff);
-        free(buff->body);
-        free(buff);
+        recycle_buff(buff);
         return *meta;
     } else {
         for (int i = 0; i < kind_count; ++i) {
@@ -91,4 +89,9 @@ void out_token(Token *token) {
 }
 
 
+void* require_not_null(void* any, char *message){
+    if (any == NULL)
+        log_error("%s",message);
+    return any;
+}
 

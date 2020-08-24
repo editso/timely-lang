@@ -90,6 +90,8 @@ void *parse_while(Parser *parser);
 
 void *parse_if(Parser *parser);
 
+void *parse_else(Parser* parser);
+
 /**
  * 异常处理
  * @param parser 指针

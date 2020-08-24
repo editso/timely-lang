@@ -35,4 +35,12 @@ void* try_eval(Environment* env, TryStmt* stmt);
 void* catch_eval(Environment* env, CatchStmt* stmt);
 
 void* class_eval(Environment* env, ClassStmt* stmt);
+
+void* modifier_eval(Environment* env, Modifier * stmt);
+void* type_eval(Environment* env, Type * stmt);
+void* subscript_eval(Environment* env, ArraySubscript* subscript);
+void* if_eval(Environment* env, IFStmt * ifStmt);
+void* else_eval(Environment* env, ElseStmt * elseStmt);
+void* switch_eval(Environment* env, SwitchStmt* switchStmt);
+void* case_eval(Environment* env, CaseStmt * caseStmt);
 #endif //TIMELY_LANG_EVAL_H

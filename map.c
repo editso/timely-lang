@@ -5,6 +5,7 @@
 #include "include/list.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <stddef.h>
 
 unsigned long hash(void *key) {
     return key ? (unsigned long) key : 0;

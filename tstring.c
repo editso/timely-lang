@@ -3,7 +3,7 @@
 //
 #include "include/tstring.h"
 #include "include/basic.h"
-
+#include "include/tmath.h"
 
 void buff_zero(char* buff, unsigned int size){
     memset(buff, '\0', size);
@@ -13,12 +13,12 @@ CharBuff* new_buff(unsigned int size){
     CharBuff* buff = malloc(sizeof(CharBuff));
     size =  MALLOC_SIZE(char, +size);
     buff->body = malloc(MALLOC_SIZE(char, +size));
-    buff_zero(buff->body, size);
     buff->len = 0;
+    buff->init_size = size;
     buff->buff_size = size;
+    buff_zero(buff->body, size);
     return buff;
 }
-
 
 unsigned long str_len_(const char* s){
     if (s == NULL)return 0;
@@ -70,7 +70,7 @@ int append_str(CharBuff* buff, char *c){
 }
 
 char* to_string(CharBuff* buff){
-    char* s = malloc(MALLOC_SIZE(char,  +buff->len));
+    char* s = malloc(MALLOC_SIZE(char,  +buff->len-1));
     buff_zero(s, buff->len);
     return strcpy(s, buff->body);
 }
@@ -80,11 +80,11 @@ void print_buff(CharBuff* buff){
 }
 
 void clear_buff(CharBuff* buff){
-    void* old = buff->body;
-    buff->body = malloc(sizeof(char) * buff->len * 2);
-    free(old);
-    buff->buff_size = buff->len;
+    free(buff->body);
+    buff->body = malloc(sizeof(char) * buff->init_size);
+    buff->buff_size = buff->init_size;
     buff->len = 0;
+    buff_zero(buff->body, buff->init_size);
 }
 
 char buff_get(CharBuff* buff, int index){

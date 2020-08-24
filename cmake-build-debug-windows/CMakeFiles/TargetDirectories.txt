@@ -1,0 +1,3 @@
+/mnt/dev/c/timely-lang/cmake-build-debug-windows/CMakeFiles/rebuild_cache.dir
+/mnt/dev/c/timely-lang/cmake-build-debug-windows/CMakeFiles/edit_cache.dir
+/mnt/dev/c/timely-lang/cmake-build-debug-windows/CMakeFiles/timely.dir

@@ -5,26 +5,24 @@
 #include "include/list.h"
 #include "include/basic.h"
 #include "include/tstring.h"
+#include "include/ttypes.h"
 
-char c_buf_[1];
-
-int read_chr(struct lexer *lexer) {
+uint read_chr(struct lexer *lexer) {
     if (lexer->file == NULL) return END;
-    if (lexer->last_chr == EMPTY) {
-        bzero(c_buf_, sizeof(c_buf_));
-        lexer->col_pos++;
-        if (fread(c_buf_, sizeof(c_buf_), 1, lexer->file) <= 0) {
-            fclose(lexer->file); // 关流
-            lexer->also = t_false;
-            lexer->file = NULL;
-            return END;
-        }
-        return *c_buf_;
-    } else {
+    if (lexer->last_chr != EMPTY) {
         int chr = lexer->last_chr;
         lexer->last_chr = EMPTY;
         return chr;
     }
+    lexer->col_pos++;
+    uint chr;
+    if ((chr = getc(lexer->file)) == EOF) {
+        fclose(lexer->file); // 关流
+        lexer->also = t_false;
+        lexer->file = NULL;
+        return END;
+    }
+    return chr;
 }
 
 int is_letter(int chr) {
@@ -57,12 +55,12 @@ KindMeta find_kind(char *kind) {
     return EMPTY_KIND;
 }
 
-Token *new_token(struct lexer *lexer, int kind, char *text) {
-    Token *token = malloc(sizeof(Token));
-    token->col_pos = lexer->col_pos - 1 - strlen(text);
+Token *new_token(Lexer *lexer, int kind, char *s) {
+    Token *token = new(Token);
+    token->col_pos = lexer->col_pos - 1 - strlen(s);
     token->row_pos = lexer->row_pos;
     token->kind = kind;
-    token->text = text;
+    token->text = s;
     return token;
 }
 
@@ -87,7 +85,7 @@ char *read_letter(Lexer *lexer, CharBuff* buff) {
 }
 
 char *read_digit(Lexer *lexer, CharBuff* buff) {
-    int chr;
+    uint chr;
     t_bool dot = t_false;
     while ((chr = read_chr(lexer)) != END) {
         if (is_digit(chr)) {
@@ -225,10 +223,10 @@ Token *read_operator(Lexer* lexer, CharBuff* buff){
         }
     }
     append_chr(buff, (char)chr);
-    return new_token(lexer, EMPTY,to_string(buff));
+    return new_token(lexer, EMPTY, to_string(buff));
 }
 
-Token* select_token(Lexer* lexer, int chr, CharBuff* buff){
+Token* generate_token(Lexer* lexer, int chr, CharBuff* buff){
     switch (chr) {
         case ' ':
             break;
@@ -295,11 +293,10 @@ void read_all(Lexer *lexer) {
             lexer->row_pos++;
         }
         clear_buff(buff);
-        if ((token = select_token(lexer, chr, buff))->kind == EMPTY)continue;
+        if ((token = generate_token(lexer, chr, buff))->kind == EMPTY)continue;
         list_add(lexer->tokens, token);
     }
-    free(buff->body);
-    free(buff);
+    recycle_buff(buff);
 }
 
 /**

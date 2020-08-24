@@ -15,8 +15,7 @@
 #define t_false 0
 #define STR2(s) #s
 #define STR(s) STR2(s)
-#define new(type) malloc(sizeof(type))
-
+#define new(type) require_not_null(malloc(sizeof(type)), "Failed to allocate space")
 
 #ifndef __TIMELY__JMP__
 #define __TIMELY__JMP__
@@ -36,5 +35,6 @@ unsigned long hash(void *key);
 
 void out_token(Token *token);
 
+void* require_not_null(void* any, char *message);
 
 #endif //TIMELY_LANG_BASIC_H

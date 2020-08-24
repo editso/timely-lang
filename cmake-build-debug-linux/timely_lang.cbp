@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="timely_lang"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/mnt/dev/c/timely-lang/cmake-build-debug-linux"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/mnt/dev/c/timely-lang/cmake-build-debug-linux/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/mnt/dev/c/timely-lang/cmake-build-debug-linux/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/mnt/dev/c/timely-lang/cmake-build-debug-linux/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/mnt/dev/c/timely-lang/cmake-build-debug-linux/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/mnt/dev/c/timely-lang/cmake-build-debug-linux"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/mnt/dev/c/timely-lang/cmake-build-debug-linux/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/mnt/dev/c/timely-lang/cmake-build-debug-linux/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/mnt/dev/c/timely-lang/cmake-build-debug-linux/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/mnt/dev/c/timely-lang/cmake-build-debug-linux/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/mnt/dev/c/timely-lang/cmake-build-debug-linux"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/mnt/dev/c/timely-lang/cmake-build-debug-linux/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/mnt/dev/c/timely-lang/cmake-build-debug-linux/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/mnt/dev/c/timely-lang/cmake-build-debug-linux/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/mnt/dev/c/timely-lang/cmake-build-debug-linux/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="timely">
+				<Option output="/mnt/dev/c/timely-lang/cmake-build-debug-linux/timely" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/mnt/dev/c/timely-lang/cmake-build-debug-linux"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/10.1.0/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/10.1.0/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/mnt/dev/c/timely-lang/cmake-build-debug-linux/Makefile&quot;  VERBOSE=1 timely"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/mnt/dev/c/timely-lang/cmake-build-debug-linux/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/mnt/dev/c/timely-lang/cmake-build-debug-linux/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/mnt/dev/c/timely-lang/cmake-build-debug-linux/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="timely/fast">
+				<Option output="/mnt/dev/c/timely-lang/cmake-build-debug-linux/timely" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/mnt/dev/c/timely-lang/cmake-build-debug-linux"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/10.1.0/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/10.1.0/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/mnt/dev/c/timely-lang/cmake-build-debug-linux/Makefile&quot;  VERBOSE=1 timely/fast"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/mnt/dev/c/timely-lang/cmake-build-debug-linux/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/mnt/dev/c/timely-lang/cmake-build-debug-linux/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/mnt/dev/c/timely-lang/cmake-build-debug-linux/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/mnt/dev/c/timely-lang/basic.c">
+			<Option target="timely"/>
+		</Unit>
+		<Unit filename="/mnt/dev/c/timely-lang/envir.c">
+			<Option target="timely"/>
+		</Unit>
+		<Unit filename="/mnt/dev/c/timely-lang/eval.c">
+			<Option target="timely"/>
+		</Unit>
+		<Unit filename="/mnt/dev/c/timely-lang/include/basic.h">
+			<Option target="timely"/>
+		</Unit>
+		<Unit filename="/mnt/dev/c/timely-lang/include/envir.h">
+			<Option target="timely"/>
+		</Unit>
+		<Unit filename="/mnt/dev/c/timely-lang/include/eval.h">
+			<Option target="timely"/>
+		</Unit>
+		<Unit filename="/mnt/dev/c/timely-lang/include/lexer.h">
+			<Option target="timely"/>
+		</Unit>
+		<Unit filename="/mnt/dev/c/timely-lang/include/list.h">
+			<Option target="timely"/>
+		</Unit>
+		<Unit filename="/mnt/dev/c/timely-lang/include/log.h">
+			<Option target="timely"/>
+		</Unit>
+		<Unit filename="/mnt/dev/c/timely-lang/include/map.h">
+			<Option target="timely"/>
+		</Unit>
+		<Unit filename="/mnt/dev/c/timely-lang/include/parser.h">
+			<Option target="timely"/>
+		</Unit>
+		<Unit filename="/mnt/dev/c/timely-lang/include/stack.h">
+			<Option target="timely"/>
+		</Unit>
+		<Unit filename="/mnt/dev/c/timely-lang/include/tio.h">
+			<Option target="timely"/>
+		</Unit>
+		<Unit filename="/mnt/dev/c/timely-lang/include/tmath.h">
+			<Option target="timely"/>
+		</Unit>
+		<Unit filename="/mnt/dev/c/timely-lang/include/token.h">
+			<Option target="timely"/>
+		</Unit>
+		<Unit filename="/mnt/dev/c/timely-lang/include/tree.h">
+			<Option target="timely"/>
+		</Unit>
+		<Unit filename="/mnt/dev/c/timely-lang/include/tstring.h">
+			<Option target="timely"/>
+		</Unit>
+		<Unit filename="/mnt/dev/c/timely-lang/include/ttypes.h">
+			<Option target="timely"/>
+		</Unit>
+		<Unit filename="/mnt/dev/c/timely-lang/lexer.c">
+			<Option target="timely"/>
+		</Unit>
+		<Unit filename="/mnt/dev/c/timely-lang/list.c">
+			<Option target="timely"/>
+		</Unit>
+		<Unit filename="/mnt/dev/c/timely-lang/log.c">
+			<Option target="timely"/>
+		</Unit>
+		<Unit filename="/mnt/dev/c/timely-lang/main.c">
+			<Option target="timely"/>
+		</Unit>
+		<Unit filename="/mnt/dev/c/timely-lang/map.c">
+			<Option target="timely"/>
+		</Unit>
+		<Unit filename="/mnt/dev/c/timely-lang/parser.c">
+			<Option target="timely"/>
+		</Unit>
+		<Unit filename="/mnt/dev/c/timely-lang/stack.c">
+			<Option target="timely"/>
+		</Unit>
+		<Unit filename="/mnt/dev/c/timely-lang/tio.c">
+			<Option target="timely"/>
+		</Unit>
+		<Unit filename="/mnt/dev/c/timely-lang/tmath.c">
+			<Option target="timely"/>
+		</Unit>
+		<Unit filename="/mnt/dev/c/timely-lang/tree.c">
+			<Option target="timely"/>
+		</Unit>
+		<Unit filename="/mnt/dev/c/timely-lang/tstring.c">
+			<Option target="timely"/>
+		</Unit>
+		<Unit filename="/mnt/dev/c/timely-lang/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>

@@ -9,57 +9,56 @@
 #include "list.h"
 #include "envir.h"
 
-typedef struct {
+#define to_eval(any) ((Eval*)any)
+
+#define eval_callback(fun) ((void *(*)(Environment *, void *))fun)
+
+#define tree_node typedef struct
+
+tree_node {
     void *(*eval)(Environment *env, void *node);
 } Eval;
 
-#define GET_EVAL(eval) ((Eval*)eval)
-
-#define GET_FUN(fun) ((void *(*)(Environment *, void *))fun)
-
-
-typedef struct modifier_{
-    Eval eval;
-    List* modifiers;
-}Modifier;
-
-
-typedef struct {
+tree_node {
     Eval eval;
     List *stmts;
 } Tree;
 
-typedef struct stmt_{
+tree_node modifier_{
+    Eval eval;
+    List* modifiers;
+}Modifier;
+
+tree_node stmt_{
     Eval eval;
     List* stmt;
 }Stmt;
 
-typedef struct {
+tree_node {
     Eval eval;
     void *left;
     Token *op;
     void *right;
 } BinaryExpr;
 
-
-typedef struct {
+tree_node{
     Eval eval;
     Token *op;
     void *expr;
 } StartTerm;
 
-typedef struct {
+tree_node {
     Eval eval;
     Token *op;
     void *expr;
 } EndTerm;
 
-typedef struct type_{
+tree_node type_{
     Eval eval;
     Token* name;
 }Type;
 
-typedef struct {
+tree_node {
     Eval eval;
     Token *name;
     void *value;
@@ -67,8 +66,7 @@ typedef struct {
     Modifier* modifier;
 } VarTerm;
 
-
-typedef struct {
+tree_node {
     Eval eval;
     Token *name;
 } ConstantTerm;
@@ -77,43 +75,42 @@ typedef struct {
 /**
  * 函数调用
  */
-typedef struct {
+tree_node {
     Eval eval;
     void *expr;
     List *args;
 } CallTerm;
 
 
-typedef struct {
+tree_node {
     Eval eval;
     List *stmts;
 } BlockStmt;
 
-typedef struct {
+tree_node {
     Eval eval;
     Token *token;
 } EmptyStmt;
 
-typedef struct {
+tree_node {
     Eval eval;
     void *expr;
     void *block;
 } WhileStmt;
 
-typedef struct if_{
-    Eval* eval;
-    // if(expr)
+tree_node if_{
+    Eval eval;
     void* expr;
-    //  {}
     void* block;
-    // else if(){}
-    List* elseif;
-    // else{}
     void* elsexpr;
 }IFStmt;
 
+tree_node else_{
+    Eval eval;
+    void* block;
+}ElseStmt;
 
-typedef struct {
+tree_node {
     Eval eval;
     Token *name;
     List *args;
@@ -121,16 +118,13 @@ typedef struct {
     Modifier* modifier;
 } FunStmt;
 
-
-
-typedef struct {
+tree_node {
     Eval eval;
     void *expr;
     void *block;
 } CatchStmt;
 
-
-typedef struct {
+tree_node{
     Eval eval;
 
     /**
@@ -161,40 +155,39 @@ typedef struct {
     void *stmt;
 } TryStmt;
 
-
-typedef struct {
+tree_node {
     Eval eval;
     Token *name;
     List *extends;
-    void *block;
+    BlockStmt *block;
     Modifier* modifier;
 } ClassStmt;
 
-typedef struct{
+tree_node{
     Eval eval;
     void* name;
     void* expr;
 }ArraySubscript;
 
-typedef struct{
+tree_node{
     Eval eval;
     void* object;
     void* expr;
 }SelectMember;
 
-typedef struct expr_{
+tree_node expr_{
     Eval eval;
     void* expr;
 }Expr;
 
-typedef struct switch_{
+tree_node switch_{
     Eval eval;
     void* expr;
     List* cases;
     void* defexpr;
 }SwitchStmt;
 
-typedef struct case_{
+tree_node case_{
     Expr eval;
     void* expr;
     void* block;
@@ -212,7 +205,6 @@ BlockStmt *new_block_stmt(List *stmts);
 
 WhileStmt *new_while_stmt(void *expr, void *block);
 
-
 StartTerm *new_start_term(Token *op, void *expr);
 
 EndTerm *new_end_term(Token *op, void *expr);
@@ -227,13 +219,12 @@ TryStmt *new_try_stmt(void *block, List *stmts, void *finally);
 
 CatchStmt *new_catch_stmt(void *expr, void *block);
 
-ClassStmt *new_class_stmt(Token *name, List *parent, void *block, Modifier* modifier);
+ClassStmt *new_class_stmt(Token *name, List *parent, BlockStmt *block, Modifier* modifier);
 
 Modifier* new_modifier(List* modifiers);
 Type* new_type(Token* name);
 
 Stmt* new_stmt(List* stmt);
-
 
 ArraySubscript*  new_array_subscript(void* name, void* expr);
 
@@ -241,8 +232,10 @@ SelectMember* new_select_member( void* object, void* expr);
 
 Expr* new_expr(void* expr);
 
-IFStmt* new_if_stmt(void* expr, void* block, List* elseif, void*  elsexpr);
+IFStmt* new_if_stmt(void* expr, void* block, void*  elsexpr);
+ElseStmt* new_else_stmt(void *block);
 
 SwitchStmt* new_switch_stmt(void* expr, List* cases, void* defexpr);
+
 CaseStmt* new_case_stmt(void* expr, void* block);
 #endif //TIMELY_LANG_TREE_H
