@@ -81,7 +81,7 @@ void print_buff(CharBuff* buff){
 
 void clear_buff(CharBuff* buff){
     free(buff->body);
-    buff->body = malloc(sizeof(char) * buff->init_size);
+    buff->body = require_not_null(malloc(sizeof(char) * buff->init_size), "clear buff error!");
     buff->buff_size = buff->init_size;
     buff->len = 0;
     buff_zero(buff->body, buff->init_size);

@@ -9,12 +9,22 @@
 #include "stdarg.h"
 #include "token.h"
 
+#if defined(_WIN16) || defined(_WIN32) || defined(_WIN64)
+#define FONT_COLOR_RED      ""
+#define COLOR_NONE          ""
+#define FONT_COLOR_BLACK    ""
+#define FONT_COLOR_YELLOW   ""
+#define FONT_COLOR_GREEN    ""
+#define COLOR_YR            ""
+#elif defined(__linux__)
 #define FONT_COLOR_RED      "\033[31m"
 #define COLOR_NONE          "\033[0m"
 #define FONT_COLOR_BLACK    "\033[30m"
 #define FONT_COLOR_YELLOW   "\033[33m"
 #define FONT_COLOR_GREEN    "\033[32m"
 #define COLOR_YR            "\033[46;31m"
+#else
+#endif
 
 #define TAG_ERROR       FONT_COLOR_RED"ERROR"COLOR_NONE ": "
 #define TAG_INFO        FONT_COLOR_GREEN"INFO"COLOR_NONE ": "

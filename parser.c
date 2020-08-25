@@ -95,8 +95,7 @@ Parser *new_parser(Lexer *lexer) {
 Tree *parse(Parser *parser) {
     move(parser);
     while (token(parser)->kind != END) {
-        out_token(token(parser));
-//        list_add(parser->tree->stmts, parse_stmt(parser));
+        list_add(parser->tree->stmts, parse_stmt(parser));
         move(parser);
     }
     return parser->tree;

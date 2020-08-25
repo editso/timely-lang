@@ -15,15 +15,15 @@ uint read_chr(struct lexer *lexer) {
         lexer->last_chr = EMPTY;
         return chr;
     }
-    if ((chr = getc(lexer->file)) == EOF) {
+    if ((chr = fgetc(lexer->file)) == EOF) {
         fclose(lexer->file); // 关流
-        lexer->also = t_false;
         lexer->file = NULL;
         return END;
     }
     lexer->col_pos++;
     return chr;
 }
+
 
 int is_letter(int chr) {
     return chr >= 'a' && chr <= 'z' ||
@@ -170,13 +170,14 @@ char *read_multi_note(Lexer *lexer, CharBuff* buff) {
  * 单行
  */
 char *read_single_note(Lexer *lexer, CharBuff* buff) {
-    int chr;
+    uint chr;
     while ((chr = read_chr(lexer))) {
         if (is_new_line(chr) || chr == END) {
             lexer->row_pos++;
             lexer->col_pos = 1;
             break;
         }
+        if (chr > 127)continue;
         append_chr(buff, (char) chr);
     }
     return to_string(buff);
@@ -257,7 +258,6 @@ Token* generate_token(Lexer* lexer, int chr, CharBuff* buff){
         case '"':
             /**
              *  处理字符串
-             *
              */
             unread_chr(lexer, chr);
             return new_token(lexer, CONST_STRING, read_string(lexer, buff));
@@ -284,8 +284,8 @@ Token* generate_token(Lexer* lexer, int chr, CharBuff* buff){
 }
 
 void read_all(Lexer *lexer) {
-    int chr;
     CharBuff *buff = new_buff(10);
+    int chr;
     Token* token;
     while ((chr = read_chr(lexer)) != END) {
         if (is_new_line(chr)) {
@@ -307,18 +307,15 @@ void read_all(Lexer *lexer) {
  */
 t_bool fill_list(Lexer *lexer, int index) {
     if (index >= lexer->tokens->size) {
-        if (lexer->also) {
-            read_all(lexer);
-        } else {
-            return t_false;
-        }
+        if (lexer->file == NULL)return t_false;
+        read_all(lexer);
     }
     return t_true;
 }
 
 Lexer *new_lexer(char *file) {
-    struct lexer *lexer = new(Lexer);
-    if ((lexer->file = fopen(file, "r")) == NULL) {
+    Lexer *lexer = new(Lexer);
+    if ((lexer->file = fopen(file, "rb+")) == NULL) {
         perror("timely");
         exit(0);
     }
@@ -327,7 +324,6 @@ Lexer *new_lexer(char *file) {
     lexer->last_chr = EMPTY;
     lexer->row_pos = 1;
     lexer->col_pos = 1;
-    lexer->also = t_true;
     return lexer;
 }
 

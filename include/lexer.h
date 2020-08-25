@@ -20,7 +20,6 @@ typedef struct lexer{
     unsigned int col_pos;
     unsigned int row_pos;
     int last_chr; // 最后一次的位置
-    t_bool also; // 是否已经读完了
     List* tokens;
 }Lexer;
 

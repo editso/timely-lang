@@ -9,6 +9,7 @@
 #include <errno.h>
 #include <stdlib.h>
 
+
 #define new_char(chr) memset(malloc(sizeof(char)), chr, 1)
 #define t_bool int
 #define t_true  1
