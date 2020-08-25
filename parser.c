@@ -302,7 +302,16 @@ void *parse_block(Parser *parser) {
 }
 
 void *parse_call(Parser *parser) {
-    return NULL;
+    Token* token = token(parser);
+    List* args = new_list();
+    move(parser);
+    expect(parser, OP_BRA);
+    while (token(parser)->kind != CL_BRA){
+        list_add(args,parse_expr(parser));
+        move(parser);
+    }
+    expect(parser, CL_BRA);
+    return new_call_term(new_constant_term(token), args);
 }
 
 void *parse_if(Parser *parser) {
