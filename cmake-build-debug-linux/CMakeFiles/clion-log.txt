@@ -1,8 +1,0 @@
-/usr/share/clion-2020.2/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /mnt/dev/c/timely-lang
-CMake Error at CMakeLists.txt:6:
-  Parse error.  Expected a command name, got unquoted argument with text
-  "<<<<<<<".
-
-
--- Configuring incomplete, errors occurred!
-See also "/mnt/dev/c/timely-lang/cmake-build-debug-linux/CMakeFiles/CMakeOutput.log".

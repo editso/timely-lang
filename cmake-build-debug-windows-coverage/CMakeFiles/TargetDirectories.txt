@@ -1,3 +1,0 @@
-/mnt/dev/c/timely-lang/cmake-build-debug-windows-coverage/CMakeFiles/rebuild_cache.dir
-/mnt/dev/c/timely-lang/cmake-build-debug-windows-coverage/CMakeFiles/edit_cache.dir
-/mnt/dev/c/timely-lang/cmake-build-debug-windows-coverage/CMakeFiles/timely.dir

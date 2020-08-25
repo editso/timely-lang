@@ -1,3 +1,0 @@
-/mnt/dev/c/timely-lang/cmake-build-debug-linux/CMakeFiles/rebuild_cache.dir
-/mnt/dev/c/timely-lang/cmake-build-debug-linux/CMakeFiles/edit_cache.dir
-/mnt/dev/c/timely-lang/cmake-build-debug-linux/CMakeFiles/timely.dir
