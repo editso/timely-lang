@@ -9,19 +9,19 @@
 
 uint read_chr(struct lexer *lexer) {
     if (lexer->file == NULL) return END;
+    uint chr;
     if (lexer->last_chr != EMPTY) {
-        int chr = lexer->last_chr;
+        chr = lexer->last_chr;
         lexer->last_chr = EMPTY;
         return chr;
     }
-    lexer->col_pos++;
-    uint chr;
     if ((chr = getc(lexer->file)) == EOF) {
         fclose(lexer->file); // 关流
         lexer->also = t_false;
         lexer->file = NULL;
         return END;
     }
+    lexer->col_pos++;
     return chr;
 }
 

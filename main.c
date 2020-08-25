@@ -24,7 +24,6 @@ int main(int argc, char **argv) {
         Lexer *lexer = new_lexer(argv[1]);
         Parser *parser = new_parser(lexer);
         parse(parser);
-//        to_eval(parse(parser))->eval(NULL, parser->tree);
     } catch(4) {
         log_error("遇到错误!!");
     }

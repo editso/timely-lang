@@ -20,9 +20,8 @@ CMAKE_ADDR2LINE:FILEPATH=/usr/bin/addr2line
 //Path to a program.
 CMAKE_AR:FILEPATH=/usr/bin/ar
 
-//Choose the type of build, options are: None Debug Release RelWithDebInfo
-// MinSizeRel ...
-CMAKE_BUILD_TYPE:STRING=Debug
+//No help, variable specified on the command line.
+CMAKE_BUILD_TYPE:UNINITIALIZED=Debug
 
 //Id string of the compiler for the CodeBlocks IDE. Automatically
 // detected when left empty
@@ -52,8 +51,8 @@ CMAKE_C_COMPILER_AR:FILEPATH=/usr/bin/gcc-ar
 // for the GCC compiler
 CMAKE_C_COMPILER_RANLIB:FILEPATH=/usr/bin/gcc-ranlib
 
-//Flags used by the C compiler during all build types.
-CMAKE_C_FLAGS:STRING=--coverage
+//No help, variable specified on the command line.
+CMAKE_C_FLAGS:UNINITIALIZED=--coverage
 
 //Flags used by the C compiler during DEBUG builds.
 CMAKE_C_FLAGS_DEBUG:STRING=-g

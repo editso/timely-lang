@@ -1,17 +1,9 @@
 /usr/share/clion-2020.2/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS=--coverage -DCMAKE_C_FLAGS=--coverage -G "CodeBlocks - Unix Makefiles" /mnt/dev/c/timely-lang
--- The C compiler identification is GNU 10.1.0
--- Check for working C compiler: /usr/bin/cc
--- Check for working C compiler: /usr/bin/cc - works
--- Detecting C compiler ABI info
--- Detecting C compiler ABI info - done
--- Detecting C compile features
--- Detecting C compile features - done
--- Configuring done
--- Generating done
-CMake Warning:
-  Manually-specified variables were not used by the project:
-
-    CMAKE_CXX_FLAGS
+CMake Error at CMakeLists.txt:6:
+  Parse error.  Expected a command name, got unquoted argument with text
+  "<<<<<<<".
 
 
--- Build files have been written to: /mnt/dev/c/timely-lang/cmake-build-debug-windows-coverage
+-- Configuring incomplete, errors occurred!
+See also "/mnt/dev/c/timely-lang/cmake-build-debug-windows-coverage/CMakeFiles/CMakeOutput.log".
+See also "/mnt/dev/c/timely-lang/cmake-build-debug-windows-coverage/CMakeFiles/CMakeError.log".

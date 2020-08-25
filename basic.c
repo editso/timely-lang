@@ -88,7 +88,6 @@ void out_token(Token *token) {
           token->col_pos);
 }
 
-
 void* require_not_null(void* any, char *message){
     if (any == NULL)
         log_error("%s",message);
