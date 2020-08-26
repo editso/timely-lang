@@ -49,19 +49,19 @@
  */
 extern unsigned int log_level_;
 
-void log_log(unsigned int l, FILE *file, char *message, va_list list);
+void log_log(unsigned int l, FILE *file, const char *message, va_list list);
 
-void log_error(char *message, ...);
+void log_error(const char *message, ...);
 
-void log_warning(char *message, ...);
+void log_warning(const char *message, ...);
 
-void log_info(char *message, ...);
+void log_info(const char *message, ...);
 
-void log_debug(char *message, ...);
+void log_debug(const char *message, ...);
 
-void log_code(char *file, int row, int col, char *message, ...);
+void log_code(char *file, int row, int col, const char *message, ...);
 
-void lexer_error(char *m, char *s, unsigned int row, unsigned int col);
+void lexer_error(const char *m, const char *s, unsigned int row, unsigned int col);
 
 
 #endif //TIMELY_LANG_LOG_H

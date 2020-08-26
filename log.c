@@ -5,14 +5,14 @@
 #include "include/tstring.h"
 #include <stdlib.h>
 
-void log_log(unsigned int l, FILE *file, char* message, va_list list){
+void log_log(unsigned int l, FILE *file, const char* message, va_list list){
     if (is_level(l)){
         vfprintf(file, message, list);
         fprintf(file,"\n");
     }
 }
 
-void log_error(char* message, ...){
+void log_error(const char* message, ...){
     va_list list;
     va_start(list,message);
     CharBuff* buff = new_buff(1024);
@@ -25,7 +25,7 @@ void log_error(char* message, ...){
 }
 
 
-void log_warning(char* message, ...){
+void log_warning(const char* message, ...){
     va_list list;
     va_start(list,message);
     CharBuff* buff = new_buff(1024);
@@ -36,7 +36,7 @@ void log_warning(char* message, ...){
     recycle_buff(buff);
 }
 
-void log_info(char* message, ...){
+void log_info(const char* message, ...){
     va_list list;
     va_start(list,message);
     CharBuff* buff = new_buff(1024);
@@ -47,7 +47,7 @@ void log_info(char* message, ...){
     recycle_buff(buff);
 }
 
-void log_debug(char *message, ...){
+void log_debug(const char *message, ...){
     va_list list;
     va_start(list,message);
     CharBuff* buff = new_buff(1024);
@@ -58,7 +58,7 @@ void log_debug(char *message, ...){
     recycle_buff(buff);
 }
 
-void log_code(char *file, int row, int col, char *message, ...) {
+void log_code(char *file, int row, int col, const char *message, ...) {
     va_list args;
     va_start(args,message);
     CharBuff *buff = new_buff(100);

@@ -52,7 +52,7 @@ char *token_pos(Token *token) {
     return s;
 }
 
-void lexer_error(char *m, char *s, unsigned int row, unsigned int col) {
+void lexer_error(const char *m, const char *s, unsigned int row, unsigned int col) {
     size_t len = strlen(s);
     char buff[col + 2];
     memset(buff, '\0', col + 2);

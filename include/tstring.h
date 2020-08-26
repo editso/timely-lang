@@ -16,7 +16,7 @@ typedef struct str_buff_ {
 
 CharBuff *new_buff(unsigned int size);
 
-int append_str(CharBuff *buff, char *c);
+int append_str(CharBuff *buff,const char *c);
 
 int append_chr(CharBuff *buff, char c);
 

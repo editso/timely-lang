@@ -61,7 +61,7 @@ int append_chr(CharBuff* buff, char c){
     return sbuff_write(buff, c);
 }
 
-int append_str(CharBuff* buff, char *c){
+int append_str(CharBuff* buff, const char *c){
     unsigned long len = str_len_(c);
     for (int i = 0; i < len; ++i) {
         if (sbuff_write(buff, c[i])  == 0)return t_false;
