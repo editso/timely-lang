@@ -9,193 +9,169 @@
 #include "list.h"
 #include "envir.h"
 
-#define to_eval(any) ((Eval*)any)
+#define tree_node(tree) ((struct tree_node*)tree)
 
-#define eval_callback(fun) ((void *(*)(Environment *, void *))fun)
+#define eval_handler(handler) (eval_handler_)handler
 
-#define tree_node typedef struct
+#define tree_ typedef struct
 
-tree_node {
-    void *(*eval)(Environment *env, void *node);
-} Eval;
+typedef void *(*eval_handler_) (Environment *env, void* node);
 
-tree_node {
-    Eval eval;
+
+tree_ tree_node{
+    eval_handler_ eval;
+    Token *token;
+}TreeNode;
+
+
+tree_ {
+    TreeNode node;
     List *stmts;
 } Tree;
 
-tree_node modifier_{
-    Eval eval;
-    List* modifiers;
-}Modifier;
+tree_ modifier_ {
+    TreeNode node;
+    List *modifiers;
+} Modifier;
 
-tree_node stmt_{
-    Eval eval;
-    List* stmt;
-}Stmt;
+tree_ stmt_ {
+    TreeNode node;
+    List *stmt;
+} Stmt;
 
-tree_node {
-    Eval eval;
+tree_ {
+    TreeNode node;
     void *left;
-    Token *op;
     void *right;
 } BinaryExpr;
 
-tree_node{
-    Eval eval;
-    Token *op;
+tree_ {
+    TreeNode node;
     void *expr;
 } StartTerm;
 
-tree_node {
-    Eval eval;
-    Token *op;
+tree_ {
+    TreeNode node;
     void *expr;
 } EndTerm;
 
-tree_node type_{
-    Eval eval;
-    Token* name;
-}Type;
+tree_ type_ {
+    TreeNode node;
+} Type;
 
-tree_node {
-    Eval eval;
-    Token *name;
+tree_ {
+    TreeNode node;
     void *value;
-    Type* type;
-    Modifier* modifier;
+    Type *type;
+    Modifier *modifier;
 } VarTerm;
 
-tree_node {
-    Eval eval;
-    Token *name;
+tree_ {
+    TreeNode node;
 } ConstantTerm;
 
 
 /**
  * 函数调用
  */
-tree_node {
-    Eval eval;
+tree_ {
+    TreeNode node;
     void *expr;
     List *args;
 } CallTerm;
 
 
-tree_node {
-    Eval eval;
+tree_ {
+    TreeNode node;
     List *stmts;
 } BlockStmt;
 
-tree_node {
-    Eval eval;
-    Token *token;
+tree_ {
+    TreeNode node;
 } EmptyStmt;
 
-tree_node {
-    Eval eval;
+tree_ {
+    TreeNode node;
     void *expr;
     void *block;
 } WhileStmt;
 
-tree_node if_{
-    Eval eval;
-    void* expr;
-    void* block;
-    void* elsexpr;
-}IFStmt;
+tree_ if_ {
+    TreeNode node;
+    // if(expr)
+    void *expr;
+    void *block;
+    void *els;
+} IFStmt;
 
-tree_node else_{
-    Eval eval;
-    void* block;
-}ElseStmt;
+tree_ else_ {
+    TreeNode node;
+    void *block;
+} ElseStmt;
 
-tree_node {
-    Eval eval;
-    Token *name;
+tree_ {
+    TreeNode node;
     List *args;
     void *block;
-    Modifier* modifier;
+    Modifier *modifier;
 } FunStmt;
 
-tree_node {
-    Eval eval;
+tree_ {
+    TreeNode node;
     void *expr;
     void *block;
 } CatchStmt;
 
-tree_node{
-    Eval eval;
-
-    /**
-     * try{
-     *
-     * }
-     */
+tree_ {
+    TreeNode node;
     void *block;
-    /**
-     * try{
-     *
-     * }catch e{
-     *
-     * }catch e{
-     *
-     * }
-     */
     List *stmts;
-    /**
-     * try{
-     *
-     * }catch e{
-     *
-     * }finally{
-     *
-     * }
-     */
     void *stmt;
 } TryStmt;
 
-tree_node {
-    Eval eval;
-    Token *name;
+tree_ {
+    TreeNode node;
     List *extends;
     BlockStmt *block;
-    Modifier* modifier;
+    Modifier *modifier;
 } ClassStmt;
 
-tree_node{
-    Eval eval;
-    void* name;
-    void* expr;
-}ArraySubscript;
+tree_ {
+    TreeNode node;
+    void *name;
+    void *expr;
+} ArraySubscript;
 
-tree_node{
-    Eval eval;
-    void* object;
-    void* expr;
-}SelectMember;
+tree_ {
+    TreeNode node;
+    void *object;
+    void *expr;
+} SelectMember;
 
-tree_node expr_{
-    Eval eval;
-    void* expr;
-}Expr;
+tree_ expr_ {
+    TreeNode node;
+    void *expr;
+} Expr;
 
-tree_node switch_{
-    Eval eval;
-    void* expr;
-    List* cases;
-    void* defexpr;
-}SwitchStmt;
+tree_ switch_ {
+    TreeNode node;
+    void *expr;
+    List *cases;
+    void *t_default;
+} SwitchStmt;
 
-tree_node case_{
-    Expr eval;
-    void* expr;
-    void* block;
-}CaseStmt;
+tree_ case_ {
+    TreeNode node;
+    void *expr;
+    void *block;
+} CaseStmt;
+
+
+TreeNode* new_tree_node(Token *tok, eval_handler_ eval);
 
 Tree *new_tree(List *list);
 
-VarTerm *new_var_term(Token *name, void *expr, Type* type, Modifier* modifier);
+VarTerm *new_var_term(Token *name, void *expr, Type *type, Modifier *modifier);
 
 ConstantTerm *new_constant_term(Token *name);
 
@@ -211,7 +187,7 @@ EndTerm *new_end_term(Token *op, void *expr);
 
 EmptyStmt *new_empty(Token *op);
 
-FunStmt *new_fun_stmt(Token *name, List *args, void *block, Modifier* modifier);
+FunStmt *new_fun_stmt(Token *name, List *args, void *block, Modifier *modifier);
 
 CallTerm *new_call_term(void *expr, List *args);
 
@@ -219,23 +195,26 @@ TryStmt *new_try_stmt(void *block, List *stmts, void *finally);
 
 CatchStmt *new_catch_stmt(void *expr, void *block);
 
-ClassStmt *new_class_stmt(Token *name, List *parent, BlockStmt *block, Modifier* modifier);
+ClassStmt *new_class_stmt(Token *name, List *parent, BlockStmt *block, Modifier *modifier);
 
-Modifier* new_modifier(List* modifiers);
-Type* new_type(Token* name);
+Modifier *new_modifier(List *modifiers);
 
-Stmt* new_stmt(List* stmt);
+Type *new_type(Token *name);
 
-ArraySubscript*  new_array_subscript(void* name, void* expr);
+Stmt *new_stmt(List *stmt);
 
-SelectMember* new_select_member( void* object, void* expr);
+ArraySubscript *new_array_subscript(void *name, void *expr);
 
-Expr* new_expr(void* expr);
+SelectMember *new_select_member(void *object, void *expr);
 
-IFStmt* new_if_stmt(void* expr, void* block, void*  elsexpr);
-ElseStmt* new_else_stmt(void *block);
+Expr *new_expr(void *expr);
 
-SwitchStmt* new_switch_stmt(void* expr, List* cases, void* defexpr);
+IFStmt *new_if_stmt(void *expr, void *block, void *elsexpr);
 
-CaseStmt* new_case_stmt(void* expr, void* block);
+ElseStmt *new_else_stmt(void *block);
+
+SwitchStmt *new_switch_stmt(void *expr, List *cases, void *defexpr);
+
+CaseStmt *new_case_stmt(void *expr, void *block);
+
 #endif //TIMELY_LANG_TREE_H

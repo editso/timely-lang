@@ -4,6 +4,7 @@
 
 #ifndef TIMELY_LANG_TTYPES_H
 #define TIMELY_LANG_TTYPES_H
+#include <stddef.h>
 
 typedef unsigned int uint;
 typedef unsigned long ulong;

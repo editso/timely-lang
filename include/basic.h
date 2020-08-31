@@ -8,15 +8,18 @@
 #include <setjmp.h>
 #include <errno.h>
 #include <stdlib.h>
+#include <stddef.h>
+
+#define new(type) require_not_null(malloc(sizeof(type)), "Failed to allocate space")
+#define new_char(chr) memset(new(char), chr, 1)
+
+typedef int bool;
+#define true  1
+#define false 0
 
 
-#define new_char(chr) memset(malloc(sizeof(char)), chr, 1)
-#define t_bool int
-#define t_true  1
-#define t_false 0
 #define STR2(s) #s
 #define STR(s) STR2(s)
-#define new(type) require_not_null(malloc(sizeof(type)), "Failed to allocate space")
 
 #ifndef __TIMELY__JMP__
 #define __TIMELY__JMP__

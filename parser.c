@@ -36,20 +36,20 @@ Token *peek(Parser *parser) {
     return tok;
 }
 
-t_bool is_modifier(Token *token) {
+bool is_modifier(Token *token) {
     switch (kind(token)) {
         case PUBLIC:
         case PROTECTED:
         case PRIVATE:
         case STATIC:
         case FINAL:
-            return t_true;
+            return true;
         default:
-            return t_false;
+            return false;
     }
 }
 
-t_bool is_basic_type(Token *token) {
+bool is_basic_type(Token *token) {
     switch (kind(token)) {
         case INT:
         case CHAR:
@@ -57,13 +57,13 @@ t_bool is_basic_type(Token *token) {
         case STATIC:
         case BOOL:
         case ANY:
-            return t_true;
+            return true;
         default:
-            return t_false;
+            return false;
     }
 }
 
-t_bool is_operator(Token *token) {
+bool is_operator(Token *token) {
     switch (token->kind) {
         case ADD2:
         case SUB2:
@@ -78,9 +78,9 @@ t_bool is_operator(Token *token) {
         case ADD_EQ:
         case AND_EQ:
         case XOR_EQ:
-            return t_true;
+            return true;
         default:
-            return t_false;
+            return false;
     }
 }
 
@@ -132,13 +132,12 @@ void *parse_stmt(Parser *parser) {
         case NUMBER:
         case THIS:
         case DOT:
-        case OP_BRA:
-        case CL_BRA:
             // TODO 后期写
             return new_empty(token(parser));
         default:
             log_error("Illegal expression: %s",get_kind_meta(tok->kind).name);
     }
+    return NULL;
 }
 
 void *parse_modifier(Parser *parser) {
@@ -307,8 +306,11 @@ void *parse_call(Parser *parser) {
     move(parser);
     expect(parser, OP_BRA);
     while (token(parser)->kind != CL_BRA){
-        list_add(args,parse_expr(parser));
+        list_add(args, parse_expr(parser));
+        if (token(parser)->kind == CL_BRA)break;
         move(parser);
+        if (token(parser)->kind == COMM)
+            move(parser);
     }
     expect(parser, CL_BRA);
     return new_call_term(new_constant_term(token), args);
@@ -331,6 +333,7 @@ void *parse_else(Parser* parser){
     if (token(parser)->kind == IF){
         return new_else_stmt(parse_stmt(parser));
     }
+//    return new_empty(NULL);
     return new_else_stmt(parse_block(parser));
 }
 
@@ -398,7 +401,7 @@ void *parse_switch(Parser *parser) {
                 list_add(case_stmt, new_case_stmt(constant, parse_block(parser)));
             } else {
                 block = new_list();
-                while (t_true) {
+                while (true) {
                     if (token(parser)->kind == CASE ||
                         token(parser)->kind == DEFAULT ||
                         token(parser)->kind == CL_FL_BRA)
@@ -603,7 +606,7 @@ void *parse_end(Parser *parser) {
             // ++, ----
             EndTerm *end = NULL;
             void **p;
-            while (t_true) {
+            while (true) {
                 switch (kind(tok)) {
                     case AND2:
                     case SUB2:

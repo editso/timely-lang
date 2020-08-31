@@ -4,8 +4,6 @@
 #include "include/map.h"
 #include "include/list.h"
 #include <stdlib.h>
-#include <stdio.h>
-#include <stddef.h>
 
 unsigned long hash(void *key) {
     return key ? (unsigned long) key : 0;
@@ -16,7 +14,7 @@ unsigned int hash_fun(void *key, unsigned int m) {
 }
 
 List *map_get_(Map *map, void *key) {
-    unsigned int pos = hash_fun(key, map->prime);
+    uint pos = hash_fun(key, map->prime);
     return map->elem[pos];
 }
 
@@ -32,7 +30,7 @@ Elem *new_elem(void *key, void *value) {
  * @param number >= 2
  * @return < 2 返回 2 否则返回最大的质数
  */
-unsigned int get_prime(unsigned int number) {
+uint get_max_prime(unsigned int number) {
     for (unsigned int i = number; i >= 2; --i) {
         for (int j = 2; j < i; ++j) {
             if (i % j == 0)
@@ -49,18 +47,18 @@ Map *new_map(unsigned int size) {
     map->size = 0;
     map->capacity = size ? size : 11;
     map->elem = malloc(sizeof(List) * map->capacity);
-    map->prime = get_prime(map->capacity);
+    map->prime = get_max_prime(map->capacity);
     return map;
 }
 
 void map_put(Map *map, void *key, void *value) {
-    unsigned int pos = hash_fun(key, map->prime);
+    uint pos = hash_fun(key, map->prime);
     if (map->elem[pos] == NULL) {
         map->elem[pos] = new_list();
     }
     List *els = map_get_(map, key);
     Elem *elem;
-    Node *node = els->head;
+    ListNode *node = els->head;
     while (node != NULL) {
         elem = node->data;
         if (hash(key) == hash(elem->key)) {
@@ -77,7 +75,7 @@ void *map_get(Map *map, void *key) {
     List *els = map_get_(map, key);
     if (els == NULL)return NULL;
     Elem *elem;
-    Node *node = els->head;
+    ListNode *node = els->head;
     while (node != NULL) {
         elem = node->data;
         if (hash(key) == hash(elem->key)) {

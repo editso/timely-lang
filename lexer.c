@@ -6,6 +6,7 @@
 #include "include/basic.h"
 #include "include/tstring.h"
 #include "include/ttypes.h"
+#include <stddef.h>
 
 uint read_chr(struct lexer *lexer) {
     if (lexer->file == NULL) return END;
@@ -86,18 +87,18 @@ char *read_letter(Lexer *lexer, CharBuff* buff) {
 
 char *read_digit(Lexer *lexer, CharBuff* buff) {
     uint chr;
-    t_bool dot = t_false;
+    bool dot = false;
     while ((chr = read_chr(lexer)) != END) {
         if (is_digit(chr)) {
             append_chr(buff, (char) chr);
         } else if (chr == '.' && !dot) {
-            dot = t_true;
+            dot = true;
             int pre_chr = chr;
             chr = read_chr(lexer);
             if (is_digit(chr)) {
                 append_chr(buff, (char) pre_chr);
                 append_chr(buff, (char) chr);
-                dot = t_true;
+                dot = true;
             } else {
                 unread_chr(lexer, chr);
                 break;
@@ -305,12 +306,12 @@ void read_all(Lexer *lexer) {
  * @param index  --
  * @return 成功 true  否则 false
  */
-t_bool fill_list(Lexer *lexer, int index) {
+bool fill_list(Lexer *lexer, int index) {
     if (index >= lexer->tokens->size) {
-        if (lexer->file == NULL)return t_false;
+        if (lexer->file == NULL)return false;
         read_all(lexer);
     }
-    return t_true;
+    return true;
 }
 
 Lexer *new_lexer(char *file) {

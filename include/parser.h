@@ -34,9 +34,9 @@ typedef struct parser_ {
 } Parser;
 
 
-t_bool is_modifier(Token *token);
+bool is_modifier(Token *token);
 
-t_bool is_basic_type(Token *token);
+bool is_basic_type(Token *token);
 
 void *parse_variable(Parser *parser, Modifier *modifier);
 
@@ -88,8 +88,18 @@ void *parse_fun(Parser *parser, Modifier *modifier);
  */
 void *parse_while(Parser *parser);
 
+/**
+ * if
+ * @param parser
+ * @return
+ */
 void *parse_if(Parser *parser);
 
+/**
+ * else
+ * @param parser
+ * @return
+ */
 void *parse_else(Parser* parser);
 
 /**
@@ -99,6 +109,11 @@ void *parse_else(Parser* parser);
  */
 void *parse_try(Parser *parser);
 
+/**
+ * switch
+ * @param parser
+ * @return
+ */
 void *parse_switch(Parser *parser);
 
 /**

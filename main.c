@@ -2,9 +2,6 @@
 #include <setjmp.h>
 #include <signal.h>
 #include <errno.h>
-#include "stddef.h"
-#include "include/tio.h"
-#include <string.h>
 
 jmp_buf buf;
 
@@ -19,11 +16,10 @@ int main(int argc, char **argv) {
     signal(SIGSEGV, handler);
     signal(SIGABRT, handler);
     signal(SIGFPE, handler);
-
     try(buf) {
         Lexer *lexer = new_lexer(argv[1]);
         Parser *parser = new_parser(lexer);
-        to_eval(parse(parser))->eval(NULL, parser->tree);
+        tree_node(parse(parser))->eval(NULL, parser->tree);
     } catch(4) {
         log_error("遇到错误!!");
     }

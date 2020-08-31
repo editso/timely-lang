@@ -6,8 +6,8 @@
 #include "include/list.h"
 #include <string.h>
 
-Node* new_node(void* data){
-    Node* node = malloc(sizeof(Node));
+ListNode* new_node(void* data){
+    ListNode* node = malloc(sizeof(ListNode));
     node->data = data;
     return node;
 }
@@ -33,12 +33,12 @@ void list_add(List * list, void *data){
     list_insert(list, list->size, data);
 }
 
-Node* list_get_(List * list, unsigned int index){
+ListNode* list_get_(List * list, unsigned int index){
     if (index >= list->size || index < 0){
         return NULL;
     }
     int tmp = 0;
-    Node *curNode = list->head;
+    ListNode *curNode = list->head;
     while (curNode != NULL){
         if (tmp == index){
             return curNode;
@@ -56,7 +56,7 @@ Node* list_get_(List * list, unsigned int index){
  * @param data数据 插入成功 1, 失败-1;
  */
 int list_insert(List * list, unsigned int index, void *data){
-    Node* new = new_node(data);
+    ListNode* new = new_node(data);
     // 第一个位置插入
     if (index == 0 || index == 1){
         if (list->head == NULL){
@@ -80,7 +80,7 @@ int list_insert(List * list, unsigned int index, void *data){
             list->head = new;
         }
     }else{
-        Node* node = list_get_(list, index);
+        ListNode* node = list_get_(list, index);
         if (node != NULL){
             /**
              * 直接插入到指定位置
@@ -110,8 +110,6 @@ int list_insert(List * list, unsigned int index, void *data){
     return 1;
 }
 
-
-
 /**
  * 获取指定位置的元素
  * @param list 指向list的指针
@@ -119,7 +117,7 @@ int list_insert(List * list, unsigned int index, void *data){
  * @return 如果有返回元素的数据,否则NULL
  */
 void* list_get(List * list, unsigned int index){
-    Node* node = list_get_(list, index);
+    ListNode* node = list_get_(list, index);
     if (node == NULL)return NULL;
     return node->data;
 }
@@ -134,7 +132,7 @@ void* list_remove(List * list, unsigned int index){
     if (index >= list->size){
         return NULL;
     }
-    Node *node = list_get_(list, index);
+    ListNode *node = list_get_(list, index);
     if (node == NULL)
         return NULL;
     if (index == 0){

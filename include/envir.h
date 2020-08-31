@@ -10,7 +10,4 @@ typedef struct{
     Map map;
 }Environment;
 
-
-
-
 #endif //TIMELY_LANG_ENVIR_H

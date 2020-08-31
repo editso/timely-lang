@@ -7,8 +7,6 @@
 
 #include "tree.h"
 
-Eval *new_eval(void *(*eval_call)(Environment *env, void *node));
-
 void *binary_eval(Environment *env, BinaryExpr *expr);
 
 void *while_eval(Environment *env, WhileStmt *stmt);

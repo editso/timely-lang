@@ -4,28 +4,28 @@
 
 #ifndef TIMELY_LANG_MAP_H
 #define TIMELY_LANG_MAP_H
+#include "ttypes.h"
 
 typedef struct elem_{
     void* key;
     void* value;
 }Elem;
 
-
 typedef struct map_{
     /**
      * 当前数量
      */
-    unsigned int size;
+    uint size;
     /**
      * 容量
      */
-    unsigned int capacity;
+    uint capacity;
     /**
      * < capacity 的最大质数
      */
-    unsigned int prime;
+    uint prime;
     /**
-     * 二级指针
+     * 数组
      */
     void **elem;
 }Map;
@@ -35,7 +35,7 @@ typedef struct map_{
  * @param size 空间大小 <= 0 那么将默认开辟10个空间
  * @return
  */
-Map* new_map(unsigned int size);
+Map* new_map(uint size);
 
 /**
  * 向Map添加一个元素

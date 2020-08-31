@@ -15,6 +15,7 @@ Stack* new_stack(){
     stack->container = new_list();
     return stack;
 }
+
 /**
  * 从栈顶弹出一个元素
  * @param stack 指向该stack的指针

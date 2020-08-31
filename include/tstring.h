@@ -5,16 +5,17 @@
 #ifndef TIMELY_LANG_TSTRING_H
 #define TIMELY_LANG_TSTRING_H
 #include "string.h"
+#include "ttypes.h"
 
 typedef struct str_buff_ {
     // 初始 buff 大小
-    unsigned int init_size;
-    unsigned int len;
-    unsigned int buff_size;
+    uint init_size;
+    uint len;
+    uint buff_size;
     char *body;
 } CharBuff;
 
-CharBuff *new_buff(unsigned int size);
+CharBuff *new_buff(uint size);
 
 int append_str(CharBuff *buff,const char *c);
 
