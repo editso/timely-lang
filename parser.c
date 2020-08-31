@@ -4,6 +4,10 @@
 #include "include/parser.h"
 
 
+/**
+ * 移动 token
+ * @param parser
+ */
 void move(Parser *parser) {
     if (stack_size(parser->stack) > 0) {
         parser->token = pop(parser);
@@ -151,6 +155,48 @@ void *parse_modifier(Parser *parser) {
     return parse_id(parser, new_modifier(modifiers));
 }
 
+void *parse_variable(Parser *parser, Modifier* modifier){
+    Token* tok = token(parser);
+    expect(parser, ID);
+    Kind kid = token(parser)->kind;
+    Type* var_type = NULL;
+    if (kid == COLON){
+        move(parser);
+        if (is_basic_type(token(parser))){
+            move(parser);
+        }else{
+            expect(parser,ID);
+        }
+        var_type = new_type(token(parser));
+        kid = token(parser)->kind;
+    }
+    if (is_operator(token(parser)) || kid == EQ){
+        if (kid == EQ){
+            move(parser);
+        }
+        return new_var_term(tok, parse_expr(parser), var_type, modifier);
+    }
+    return new_var_term(tok, NULL, var_type, modifier);
+}
+
+void *parse_all_variable(Parser *parser, Modifier *modifier){
+    void* variable = parse_variable(parser, modifier);
+    if (token(parser)->kind != COMM)
+        return variable;
+    List* stmt = new_list();
+    list_add(stmt, variable);
+    while (true){
+        if (token(parser)->kind == COMM){
+            move(parser);
+            break_newline(parser);
+        }else{
+            break;
+        }
+        list_add(stmt, parse_variable(parser, modifier));
+    }
+    return new_stmt(stmt);
+}
+
 void *parse_id(Parser *parser, Modifier *modifier) {
     Token *tok = token(parser);
     switch (kind(tok)) {
@@ -162,17 +208,19 @@ void *parse_id(Parser *parser, Modifier *modifier) {
             return parse_fun(parser, modifier);
         case ID: {
             if (peek(parser)->kind == OP_BRA) {
+                if (modifier->modifiers->size > 0 ){
+                    log_error("函数调用不支持修饰符");
+                }
                 free(modifier->modifiers);
                 free(modifier);
                 return parse_call(parser);
             }
-            return parse_variable(parser, modifier);
+            return parse_all_variable(parser, modifier);
         }
         default:
             parse_error(parser, "Unprocessable statement: %s", get_kind_meta(kind(tok)).name);
     }
 }
-
 
 void *parse_class(Parser *parser, Modifier *modifier) {
     Token *name = token(parser);
@@ -226,66 +274,6 @@ void *parse_fun(Parser *parser, Modifier *modifier) {
     expect(parser, CL_BRA);
     void *block = parse_block(parser);
     return new_fun_stmt(name, args, block, modifier);
-}
-
-void *parse_variable(Parser *parser, Modifier *modifier) {
-    Token *name = token(parser);
-    expect(parser, ID);
-    if (token(parser)->kind == COLON) {
-        move(parser);
-        Token *type = token(parser);
-        if (!is_basic_type(token(parser))) {
-            expect(parser, ID);
-        } else {
-            move(parser);
-        }
-        if (token(parser)->kind == COMM) {
-            List *variables = new_list();
-            do {
-                move(parser);
-                list_add(variables, new_var_term(name, NULL, new_type(type), modifier));
-                name = token(parser);
-                expect(parser, ID);
-                if (token(parser)->kind == EQ || token(parser)->kind == DOT || is_operator(token(parser))) {
-                    move(parser);
-                    list_add(variables, new_var_term(name, parse_expr(parser), new_type(NULL), modifier));
-                } else if (token(parser)->kind == COLON) {
-                    move(parser);
-                    type = token(parser);
-                    if (!is_basic_type(token(parser))) {
-                        expect(parser, ID);
-                    }
-                    move(parser);
-                } else {
-                    parse_error(parser, "Variable type is ambiguous: %s", get_kind_meta(name->kind).name);
-                }
-                if (token(parser)->kind == EQ) {
-                    move(parser);
-                    list_add(variables, new_var_term(name, parse_expr(parser), new_type(NULL), modifier));
-                }
-//                else if (token(parser)->kind != COMM
-//                        && token(parser)->kind != NEWLINE
-//                        && token(parser)->kind != END){
-//                    out_token(token(parser));
-//                    fprintf(stderr,"%s: Variable type is ambiguous: %s",
-//                            token_pos(name),
-//                            get_kind_meta(name->kind).name);
-//                    exit(1);
-//                }
-            } while (token(parser)->kind == COMM || token(parser)->kind == ID);
-            return new_stmt(variables);
-        } else if (token(parser)->kind == EQ) {
-            move(parser);
-            return new_var_term(name, parse_expr(parser), new_type(NULL), modifier);
-        }
-    } else if (token(parser)->kind == EQ || token(parser)->kind == DOT || is_operator(token(parser))) {
-        move(parser);
-        return new_var_term(name, parse_expr(parser), new_type(NULL), modifier);
-    } else {
-        // 变量类型不明确
-        parse_error(parser, "Variable type is ambiguous: %s",get_kind_meta(name->kind).name);
-    }
-    return NULL;
 }
 
 void *parse_block(Parser *parser) {

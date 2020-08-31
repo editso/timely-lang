@@ -129,7 +129,7 @@ Modifier* new_modifier(List* modifiers){
 
 Stmt* new_stmt(List* stmt){
     Stmt* stmts = new(Stmt);
-    stmts->node = tree_node_(NULL, eval_handler(call_eval));
+    stmts->node = tree_node_(NULL, eval_handler(stmt_eval));
     stmts->stmt = stmt;
     return stmts;
 }

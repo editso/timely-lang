@@ -126,3 +126,12 @@ void* switch_eval(Environment* env, SwitchStmt* switchStmt){
 void* case_eval(Environment* env, CaseStmt * caseStmt){
     log_debug(__FUNCTION__ );
 }
+
+void *stmt_eval(Environment* env, Stmt* stmt){
+    void* elem;
+    List* stmts = stmt->stmt;
+    for (int i = 0; i < stmts->size; ++i) {
+        elem = list_get(stmts, i);
+        tree_node(elem)->eval(env, elem);
+    }
+}

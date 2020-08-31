@@ -49,4 +49,5 @@ void *switch_eval(Environment *env, SwitchStmt *switchStmt);
 
 void *case_eval(Environment *env, CaseStmt *caseStmt);
 
+void *stmt_eval(Environment* env, Stmt* stmt);
 #endif //TIMELY_LANG_EVAL_H
