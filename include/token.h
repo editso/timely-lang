@@ -7,7 +7,8 @@
 
 #define col(token) token->col_pos
 #define row(token) token->row_pos
-#define kind(token) token->kind
+#define g_kind(token) token->kind
+
 
 typedef enum {
     ID                  = 200, // 标识符

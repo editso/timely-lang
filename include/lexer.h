@@ -10,7 +10,6 @@
 #include "stdio.h"
 #define source(lexer) lexer->source
 
-
 typedef struct lexer{
     /**
      * 源文件

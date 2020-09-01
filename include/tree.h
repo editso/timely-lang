@@ -7,7 +7,11 @@
 
 #include "token.h"
 #include "list.h"
-#include "envir.h"
+
+typedef struct env_{
+    void *tree;
+    struct env_ *next;
+}Env;
 
 #define tree_node(tree) ((struct tree_node*)tree)
 
@@ -15,14 +19,13 @@
 
 #define tree_ typedef struct
 
-typedef void *(*eval_handler_) (Environment *env, void* node);
+typedef void *(*eval_handler_) (Env *env, void* node);
 
 
 tree_ tree_node{
     eval_handler_ eval;
     Token *token;
 }TreeNode;
-
 
 tree_ {
     TreeNode node;

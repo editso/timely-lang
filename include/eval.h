@@ -7,47 +7,47 @@
 
 #include "tree.h"
 
-void *binary_eval(Environment *env, BinaryExpr *expr);
+void *binary_eval(Env *env, BinaryExpr *expr);
 
-void *while_eval(Environment *env, WhileStmt *stmt);
+void *while_eval(Env *env, WhileStmt *stmt);
 
-void *var_eval(Environment *env, VarTerm *term);
+void *var_eval(Env *env, VarTerm *term);
 
-void *constant_eval(Environment *env, ConstantTerm *term);
+void *constant_eval(Env *env, ConstantTerm *term);
 
-void *block_eval(Environment *env, BlockStmt *stmt);
+void *block_eval(Env *env, BlockStmt *stmt);
 
-void *start_eval(Environment *env, StartTerm *stmt);
+void *start_eval(Env *env, StartTerm *stmt);
 
-void *end_eval(Environment *env, EndTerm *stmt);
+void *end_eval(Env *env, EndTerm *stmt);
 
-void *call_eval(Environment *env, CallTerm *term);
+void *call_eval(Env *env, CallTerm *term);
 
-void *empty_eval(Environment *env, EmptyStmt *term);
+void *empty_eval(Env *env, EmptyStmt *term);
 
-void *fun_eval(Environment *env, FunStmt *fun);
+void *fun_eval(Env *env, FunStmt *fun);
 
-void *tree_eval(Environment *env, Tree *eval);
+void *tree_eval(Env *env, Tree *eval);
 
-void *try_eval(Environment *env, TryStmt *stmt);
+void *try_eval(Env *env, TryStmt *stmt);
 
-void *catch_eval(Environment *env, CatchStmt *stmt);
+void *catch_eval(Env *env, CatchStmt *stmt);
 
-void *class_eval(Environment *env, ClassStmt *stmt);
+void *class_eval(Env *env, ClassStmt *stmt);
 
-void *modifier_eval(Environment *env, Modifier *stmt);
+void *modifier_eval(Env *env, Modifier *stmt);
 
-void *type_eval(Environment *env, Type *stmt);
+void *type_eval(Env *env, Type *stmt);
 
-void *subscript_eval(Environment *env, ArraySubscript *subscript);
+void *subscript_eval(Env *env, ArraySubscript *subscript);
 
-void *if_eval(Environment *env, IFStmt *ifStmt);
+void *if_eval(Env *env, IFStmt *ifStmt);
 
-void *else_eval(Environment *env, ElseStmt *elseStmt);
+void *else_eval(Env *env, ElseStmt *elseStmt);
 
-void *switch_eval(Environment *env, SwitchStmt *switchStmt);
+void *switch_eval(Env *env, SwitchStmt *switchStmt);
 
-void *case_eval(Environment *env, CaseStmt *caseStmt);
+void *case_eval(Env *env, CaseStmt *caseStmt);
 
-void *stmt_eval(Environment* env, Stmt* stmt);
+void *stmt_eval(Env* env, Stmt* stmt);
 #endif //TIMELY_LANG_EVAL_H

@@ -6,62 +6,64 @@
 #include "include/tio.h"
 
 
-void *binary_eval(Environment *env, BinaryExpr *expr) {
+
+void *binary_eval(Env *env, BinaryExpr *expr) {
     log_debug(__FUNCTION__ );
 
     return NULL;
 }
 
 
-void *while_eval(Environment *env, WhileStmt *stmt) {
+void *while_eval(Env *env, WhileStmt *stmt) {
     log_debug(__FUNCTION__ );
     return NULL;
 }
 
-void *var_eval(Environment *env, VarTerm *term) {
+void *var_eval(Env *env, VarTerm *term) {
     log_debug(__FUNCTION__ );
     return NULL;
 }
 
-void *constant_eval(Environment *env, ConstantTerm *term) {
+void *constant_eval(Env *env, ConstantTerm *term) {
     log_debug(__FUNCTION__ );
     return NULL;
 }
 
-void *block_eval(Environment *env, BlockStmt *stmt) {
+void *block_eval(Env *env, BlockStmt *stmt) {
     void* elem;
     List* list = stmt->stmts;
     for (int i = 0; i < list->size; ++i) {
         elem = list_get(list, i);
+        if (elem == NULL)continue;
         tree_node(elem)->eval(env, elem);
     }
     return NULL;
 }
 
 
-void *start_eval(Environment *env, StartTerm *stmt) {
+void *start_eval(Env *env, StartTerm *stmt) {
     log_debug(__FUNCTION__ );
     return NULL;
 }
 
-void *end_eval(Environment *env, EndTerm *stmt) {
+void *end_eval(Env *env, EndTerm *stmt) {
     log_debug(__FUNCTION__ );
     return NULL;
 }
 
 
-void *call_eval(Environment *env, CallTerm *term) {
+void *call_eval(Env *env, CallTerm *term) {
     log_debug(__FUNCTION__ );
     return NULL;
 }
 
-void *fun_eval(Environment *env, FunStmt *fun) {
+void *fun_eval(Env *env, FunStmt *fun) {
     log_debug(__FUNCTION__ );
     block_eval(env, fun->block);
     return NULL;
 }
 
-void *tree_eval(Environment *env, Tree *eval) {
+void *tree_eval(Env *env, Tree *eval) {
     log_debug(__FUNCTION__ );
     List *stmts = eval->stmts;
     void *node;
@@ -74,23 +76,23 @@ void *tree_eval(Environment *env, Tree *eval) {
 
 
 
-void *try_eval(Environment *env, TryStmt *stmt) {
+void *try_eval(Env *env, TryStmt *stmt) {
 
     return NULL;
 }
 
-void *catch_eval(Environment *env, CatchStmt *stmt) {
+void *catch_eval(Env *env, CatchStmt *stmt) {
     log_debug(__FUNCTION__ );
     return NULL;
 }
 
-void *empty_eval(Environment *env, EmptyStmt *term) {
+void *empty_eval(Env *env, EmptyStmt *term) {
     log_debug(__FUNCTION__ );
     return NULL;
 }
 
 
-void *class_eval(Environment *env, ClassStmt *stmt) {
+void *class_eval(Env *env, ClassStmt *stmt) {
     log_debug(__FUNCTION__ );
     block_eval(env, stmt->block);
 //    tree_node(stmt->block)->eval(env, stmt->block);
@@ -98,36 +100,39 @@ void *class_eval(Environment *env, ClassStmt *stmt) {
 }
 
 
-void* modifier_eval(Environment* env, Modifier * stmt){
+void* modifier_eval(Env* env, Modifier * stmt){
     log_debug(__FUNCTION__ );
 }
 
-void* type_eval(Environment* env, Type * stmt){
+void* type_eval(Env* env, Type * stmt){
     log_debug(__FUNCTION__ );
 }
-void* subscript_eval(Environment* env, ArraySubscript* subscript){
-    log_debug(__FUNCTION__ );
-}
-
-
-void* if_eval(Environment* env, IFStmt * ifStmt){
+void* subscript_eval(Env* env, ArraySubscript* subscript){
     log_debug(__FUNCTION__ );
 }
 
-void* else_eval(Environment* env, ElseStmt * elseStmt){
+
+void* if_eval(Env* env, IFStmt * ifStmt){
+    log_debug(__FUNCTION__ );
+    if (ifStmt->els != NULL){
+        else_eval(env, ifStmt->els);
+    }
+}
+
+void* else_eval(Env* env, ElseStmt * elseStmt){
     log_debug(__FUNCTION__ );
     block_eval(env,elseStmt->block);
 }
 
-void* switch_eval(Environment* env, SwitchStmt* switchStmt){
+void* switch_eval(Env* env, SwitchStmt* switchStmt){
     log_debug(__FUNCTION__ );
 }
 
-void* case_eval(Environment* env, CaseStmt * caseStmt){
+void* case_eval(Env* env, CaseStmt * caseStmt){
     log_debug(__FUNCTION__ );
 }
 
-void *stmt_eval(Environment* env, Stmt* stmt){
+void *stmt_eval(Env* env, Stmt* stmt){
     void* elem;
     List* stmts = stmt->stmt;
     for (int i = 0; i < stmts->size; ++i) {

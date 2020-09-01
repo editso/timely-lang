@@ -16,14 +16,11 @@
 #define push(parser, token) stack_push(parser->stack, token)
 #define pop(parser) stack_pop(parser->stack)
 
+#define log_line() log_debug(__FILE__":"STR(__LINE__))
+#define parse_error(parser, format, ...)  \
+log_line();\
+log_code(source(parser->lexer),row(parser->token),col(parser->token),format,__VA_ARGS__);
 
-
-#define parse_error(parser, format, ...)  log_code( \
-source(parser->lexer),                       \
-row(parser->token),                          \
-col(parser->token),                          \
-format,                                     \
-__VA_ARGS__)
 
 
 typedef struct parser_ {
@@ -32,7 +29,6 @@ typedef struct parser_ {
     Token *token;
     Stack *stack;
 } Parser;
-
 
 bool is_modifier(Token *token);
 
@@ -64,6 +60,7 @@ Tree *parse(Parser *parser);
  * @return 解析完成后返回一个与之对于的指针
  */
 void *parse_class(Parser *parser, Modifier *modifier);
+
 
 void *parse_class_block(Parser *parser);
 
