@@ -170,7 +170,7 @@ tree_ case_ {
 } CaseStmt;
 
 
-TreeNode* new_tree_node(Token *tok, eval_handler_ eval);
+TreeNode * new_tree_node(Token *tok, eval_handler_ eval);
 
 Tree *new_tree(List *list);
 

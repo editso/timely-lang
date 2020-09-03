@@ -14,5 +14,15 @@ typedef struct symbol_ {
 } Symbol;
 
 
+typedef struct variable_symbol_{
+    Symbol symbol;
+}VariableSymbol;
+
+typedef struct operate_symbol_{
+    Symbol symbol;
+    Token op;
+}OperateSymbol;
+
+
 
 #endif //TIMELY_LANG_SYMBOL_H
